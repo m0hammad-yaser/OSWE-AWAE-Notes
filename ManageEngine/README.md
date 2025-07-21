@@ -48,8 +48,8 @@ Match and replace roles in Notepad++ (to make the payload oneliner):
   ```
 nc -nlvp 1337
   ```
-**Exploitation Script:** https://github.com/solimanalmansor/OSWE-Prep/blob/main/OSWE-Labs/ManageEngine/windows_rce.py
+**Exploitation Script:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/ManageEngine/windows_rce.py
 ### Large Object Reverse Shell
 Keep in mind that working with large objects only works on the DBA level. Non-administrative users would not have the required permissions for these actions.
 
-**Exploitaion Script:** https://github.com/solimanalmansor/OSWE-Prep/blob/main/OSWE-Labs/ManageEngine/pg_lo_injection_rce.py
+**Exploitaion Script:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/ManageEngine/pg_lo_injection_rce.py

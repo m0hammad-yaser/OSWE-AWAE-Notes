@@ -265,7 +265,7 @@ In short, we cannot successfully serialize our payload using the DNN `SerializeD
 #### ExpandedWrapper Class
 To address the serialization issue, Muñoz and Mirosh proposed using the `ExpandedWrapper` class to finalize the construction of a malicious payload. This class allows us to wrap the original `ObjectDataProvider` and expose its relevant properties—such as `MethodName` and `MethodParameters`—as properties of the `ExpandedWrapper` instance. This approach works because `XmlSerializer` can only serialize public properties and fields, not methods. **By using `ExpandedWrapper`, we meet that requirement and enable successful serialization of the payload.**
 
-Let's see how that looks in practice: https://github.com/solimanalmansor/OSWE-Prep/blob/main/OSWE-Labs/DotNetNuke/ExpWrap/ExpWrapSerializer.cs
+Let's see how that looks in practice: https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/DotNetNuke/ExpWrap/ExpWrapSerializer.cs
 
 beginning at line `18`, we see that instead of using the `ObjectDataProvider` directly, an instance of `ExpandedWrapper<FileSystemUtils, ObjectDataProvider>` is created. The `ProjectedProperty0` property is then used to assign a new `ObjectDataProvider` instance. The rest of the code remains largely unchanged.
 
@@ -296,7 +296,7 @@ listening on [any] 1337 ...
 
 
 ```
-And run this script: https://github.com/solimanalmansor/OSWE-Prep/blob/main/OSWE-Labs/DotNetNuke/rce_script.py , containing the malicious serialized object.
+And run this script: https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/DotNetNuke/rce_script.py , containing the malicious serialized object.
 
 ```bash
 ┌──(kali㉿kali)-[~]

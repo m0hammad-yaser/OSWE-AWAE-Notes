@@ -1,2 +1,1 @@
-# OSWE-AWAE-Notes
-OSWE Notes
+## AWAE/OSWE Challenge Labs Notes & Exploitation Scripts

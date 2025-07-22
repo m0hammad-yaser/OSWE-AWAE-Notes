@@ -1,5 +1,5 @@
 # DotNetNuke Cookie Deserialization RCE
-This module covered the analysis and exploitation of a deserialization vulnerability in the .NET DNN application.These types of vulnerabilities are most often found in PHP or Java based applications.However, as we’ve demonstrated in this module, .NET applications can suffer fromthis vulnerability class as well, and the impact can be significant.
+This module analyzes and exploits a deserialization remote code execution vulnerability in the DotNetNuke (DNN) platform via malicious cookies, focusing on the .NET deserialization process, particularly the `XMLSerializer` class.
 ## Introduction
 Serialization is the process of converting structured data into a format that can be stored in a file or database, or transmitted over a network. Typically, serialization involves a producer and a consumer of the serialized data structure or object.
 We will focus on the `XMLSerializer` class, as it is directly related to the vulnerability covered in this module. As the name suggests, the `XMLSerializer` class stores the state of an object in XML format.

@@ -71,6 +71,7 @@ kali@kali:~$ rsync -azP frappe@<ERPNext_IP>:/home/frappe/frappe-bench ./
 After the transfer, open Visual Studio Code on Kali and go to `File` > `Open Folder`, then select the `frappe-bench` directory. This setup enables remote debugging from your IDE.
 #### Start Frappe and ERPNext with debugging
 SSH into the ERPNext server and start the required services: `frappe@ubuntu:~/frappe-bench$ bench start`
+
 In a second SSH session, start the web server manually:
 ```bash
 frappe@ubuntu:~$ cd /home/frappe/frappe-bench/sites/

@@ -7,7 +7,7 @@ With administrator access, we then examine a Server-Side Template Injection (SST
 We’ll need to send emails as part of bypassing the password reset functionality. To achieve this, we’ll configure ERPNext to use our Kali machine as its SMTP server.
 First, log in to the ERPNext server via SSH: `ssh frappe@<ERPNext_IP_Address>`
 
-####Edit SMTP Settings
+#### Edit SMTP Settings
 Next, modify the `site_config.json` file located at `frappe-bench/sites/site1.local/`, update the file to include the following:
 ```json
 {

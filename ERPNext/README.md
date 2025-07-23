@@ -79,3 +79,41 @@ frappe@ubuntu:~/frappe-bench$ cd /home/frappe/frappe-bench/sites
 frappe@ubuntu:~/frappe-bench/sites$ ../env/bin/python ../apps/frappe/frappe/utils/bench_helper.py frappe serve --port 8000 --noreload --nothreading
 Now ready for the IDE to connect to the debugger
 ```
+Open `app.py` in Visual Studio Code (Explorer panel), then go to the `Run & Debug panel` → click `create a launch.json file`.
+
+Choose `Python` → `Remote Attach`.
+
+Enter:
+
+    Host: ERPNext server IP
+
+    Port: 5678
+
+Set the path mapping in `launch.json`:
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Remote Attach",
+      "type": "python",
+      "request": "attach",
+      "port": 5678,
+      "host": "<Your_ERPNext_IP>",
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "/home/frappe/frappe-bench/"
+        }
+      ]
+    }
+  ]
+}
+```
+Save the file (`Ctrl+S`), then click the green `play` button to attach the debugger.
+With the debugger connected, let's verify in the SSH console that the application is available on port `8000`.
+```bash
+frappe@ubuntu:~/frappe-bench/sites$ ../env/bin/python ../apps/frappe/frappe/utils/bench_helper.py frappe serve --port 8000 --noreload --nothreading
+Now ready for the IDE to connect to the debugger
+ * Running on http://0.0.0.0:8000/ (Press CTRL+C to quit)
+```

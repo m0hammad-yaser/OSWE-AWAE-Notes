@@ -26,3 +26,39 @@ To receive the emails, configure Kali to listen for SMTP connections using Pytho
 kali@kali:~$ sudo python2 -m smtpd -n -c DebuggingServer 0.0.0.0:25
 ```
 This will start a simple SMTP server that accepts connections and prints messages to the terminal without storing them.
+### Configuring Remote Debugging
+Launch VS Code and install the Python extension.
+On the ERPNext server (via SSH), install the Python debug server:
+```bash
+/home/frappe/frappe-bench/env/bin/pip install ptvsd
+```
+Next, let's open up the `Procfile` and **comment out the section that starts the web server**. We will manually start the web server later, when debugging is enabled.
+```bash
+frappe@ubuntu:~$ cat /home/frappe/frappe-bench/Procfile 
+redis_cache: redis-server config/redis_cache.conf
+redis_socketio: redis-server config/redis_socketio.conf
+redis_queue: redis-server config/redis_queue.conf
+#web: bench serve --port 8000
+
+socketio: /usr/bin/node apps/frappe/socketio.js
+
+watch: bench watch
+
+schedule: bench schedule
+worker_short: bench worker --queue short --quiet
+worker_long: bench worker --queue long --quiet
+worker_default: bench worker --queue default --quiet
+```
+Once the `ptvsd` module is installed, the next step is to configure the ERPNext application to open a remote debugging port. This is done by modifying the application's startup script so that it launches the `ptvsd` debug server during execution.
+The file we need to edit is: `/home/frappe/frappe-bench/apps/frappe/frappe/app.py`
+
+This `app.py` script is executed whenever the `bench serve` command is called, meaning it's part of the main startup process for the Frappe/ERPNext application. By injecting our debugging code early in this file, we ensure that the remote debugger starts as soon as the application launches.
+
+To set this up, open `app.py` and add the following lines directly beneath the existing import statements:
+```python
+import ptvsd
+ptvsd.enable_attach(redirect_output=True)
+print("Now ready for the IDE to connect to the debugger")
+ptvsd.wait_for_attach()
+```
+By default, `ptvsd` listens on port `5678`, so when you configure Visual Studio Code (or another IDE) to attach to the remote debugger, be sure it connects on this port.

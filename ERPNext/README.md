@@ -1,3 +1,4 @@
 # ERPNext Authentication Bypass and Server Side Template Injection
 This module explores a methodology for discovering vulnerabilities in ERPNext, an open-source ERP system built on the Frappe Web Framework. We begin with an in-depth analysis of a SQL injection vulnerability, originally discovered in Frappe, which allows us to bypass authentication and gain administrator access.
+
 With administrator access, we then examine a Server-Side Template Injection (SSTI) vulnerability. Although it uses character blacklisting to prevent exploitation (`.__`), we demonstrate a bypass technique to execute system commands and achieve remote code execution.

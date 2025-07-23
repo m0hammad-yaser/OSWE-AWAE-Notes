@@ -22,7 +22,7 @@ Next, modify the `site_config.json` file located at `frappe-bench/sites/site1.lo
 ```
 #### Set Up SMTP Listener on Kali
 To receive the emails, configure Kali to listen for SMTP connections using Python’s built-in `smtpd` module:
-```sh
+```bash
 kali@kali:~$ sudo python2 -m smtpd -n -c DebuggingServer 0.0.0.0:25
 ```
 This will start a simple SMTP server that accepts connections and prints messages to the terminal without storing them.

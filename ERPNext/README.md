@@ -74,6 +74,8 @@ SSH into the ERPNext server and start the required services: `frappe@ubuntu:~/fr
 
 In a second SSH session, start the web server manually:
 ```bash
-frappe@ubuntu:~$ cd /home/frappe/frappe-bench/sites/
-frappe@ubuntu:~/frappe-bench/sites$ ../env/bin/python ../apps/frappe/frappe/app.py --noreload --nothreading
+frappe@ubuntu:~/frappe-bench$ cd /home/frappe/frappe-bench/sites
+
+frappe@ubuntu:~/frappe-bench/sites$ ../env/bin/python ../apps/frappe/frappe/utils/bench_helper.py frappe serve --port 8000 --noreload --nothreading
+Now ready for the IDE to connect to the debugger
 ```

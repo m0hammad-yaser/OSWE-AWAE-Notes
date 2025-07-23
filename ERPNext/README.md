@@ -117,3 +117,19 @@ frappe@ubuntu:~/frappe-bench/sites$ ../env/bin/python ../apps/frappe/frappe/util
 Now ready for the IDE to connect to the debugger
  * Running on http://0.0.0.0:8000/ (Press CTRL+C to quit)
 ```
+### Configuring MariaDB Query Logging
+Edit MariaDB config: `sudo nano /etc/mysql/my.cnf`
+Uncomment the logging settings under the `Logging and Replication` section
+```cnf
+general_log_file = /var/log/mysql/mysql.log
+general_log = 1
+
+```
+Restart MariaDB to apply changes:
+```bash
+sudo systemctl restart mysql
+```
+Monitor queries in real time:
+```
+sudo tail -f /var/log/mysql/mysql.log
+```

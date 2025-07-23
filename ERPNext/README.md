@@ -62,3 +62,17 @@ print("Now ready for the IDE to connect to the debugger")
 ptvsd.wait_for_attach()
 ```
 By default, `ptvsd` listens on port `5678`, so when you configure Visual Studio Code (or another IDE) to attach to the remote debugger, be sure it connects on this port.
+
+Before starting the services, transfer the ERPNext source code to your Kali machine so you can debug it locally using VS Code. Use the following `rsync` command:
+```bash
+kali@kali:~$ rsync -azP frappe@<ERPNext_IP>:/home/frappe/frappe-bench ./
+
+```
+After the transfer, open Visual Studio Code on Kali and go to `File` > `Open Folder`, then select the `frappe-bench` directory. This setup enables remote debugging from your IDE.
+#### Start Frappe and ERPNext with debugging
+SSH into the ERPNext server and start the required services: `frappe@ubuntu:~/frappe-bench$ bench start`
+In a second SSH session, start the web server manually:
+```bash
+frappe@ubuntu:~$ cd /home/frappe/frappe-bench/sites/
+frappe@ubuntu:~/frappe-bench/sites$ ../env/bin/python ../apps/frappe/frappe/app.py --noreload --nothreading
+```

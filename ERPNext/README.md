@@ -135,7 +135,7 @@ sudo tail -f /var/log/mysql/mysql.log
 ```
 ### SQLI Authentication Bypass
 Now that we have a list of endpoints accessible to unauthenticated users, we can start searching for vulnerabilities. A good approach is to identify functions that break the MVC or metadata-driven pattern—specifically, controllers that directly modify the model or view. Searching for SQL queries in these whitelisted functions (e.g., `whitelist(allow_guest=True)`) may help reveal issues.
-
+#### SQLI Discovery
 By searching for SQL in the `91` guest-whitelisted endpoints, we quickly identify the `web_search` function in `apps/frappe/frappe/utils/global_search.py`. To test it in Repeater, we set the request's `cmd` to `frappe.utils.global_search.web_search` and pass the required `text` parameter (e.g., `text=offsec`) after an ampersand (`&`) in the Burp request.
 
 After identifying the `web_search` function in the guest-accessible endpoints, a request was crafted in Burp Suite using `cmd=frappe.utils.global_search.web_search` and the required `text` parameter (e.g., `text=offsec`). With debugging set up in VS Code, a breakpoint at line `487` allowed inspection of the SQL query before execution:
@@ -154,3 +154,4 @@ Modifying the `scope` parameter (e.g., `scope=offsec_scope`) altered the query t
 A SQL injection payload was crafted: `offsec_scope" UNION ALL SELECT 1,2,3,4,5#`
 The successful response confirmed injection, mapping returned fields to the five selected values. Further payloads (e.g., replacing `5` with `@@version`) extracted database details: `10.2.24-MariaDB-10.2.24+maria~xenial-log`
 This confirmed the vulnerability, enabling further exploitation to escalate privileges.
+#### SQLI Exploitation -- Authentication Bypass

@@ -162,7 +162,7 @@ Frappe uses `PBKDF2` for password hashing, making password cracking difficult. A
 Frappe’s documentation shows that login data is stored in the `__Auth` table, but it does not store password reset keys. To locate the correct table, we trigger a password reset request using the email `token_searchForUserTable@mail.com`, while monitoring the MySQL logs.
 
 The logs reveal a query to:
-```log
+```bash
 frappe@ubuntu:~$ sudo tail -f /var/log/mysql/mysql.log | grep token_searchForUserTable
   4980 Query     select * from `tabUser` where `name` = 'token_searchForUserTable@mail.com' order by modified desc
 ```

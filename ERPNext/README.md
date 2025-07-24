@@ -250,5 +250,7 @@ With admin access via SQL injection, the next step is to attempt remote code exe
 Templating engines render dynamic content based on user context—for example, displaying `"Hello, Guest"` or `"Hello, Username"` in a header. They help separate views from logic in the MVC model and support reusable content.
 
 These engines use delimiters to define template blocks. In Jinja (and Python), `{{ }}` denotes expressions (e.g., `{{ 7*7 }}`), and `{% %}` denotes statements (e.g., `{% print("hello") %}`).
+
 Espression: Combination of variables and operations that results in a value. (e.g, `{{7*7}}`)
+
 Statement: represent an action. (e.g, `print("Hello, World!")`)

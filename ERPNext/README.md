@@ -256,3 +256,45 @@ These engines use delimiters to define template blocks. In Jinja (and Python), `
 Since ERPNext email templates use Jinja, we searched for `"template"` while logged in as admin and found the `"Email Template List"` page. Using Burp to capture traffic, we created a new email template titled `"Hacking with SSTI"` and inserted a basic SSTI payload `{{7*7}}` in the response field.
 
 When we used this template to compose a fake email, the output displayed `"49"`, confirming that Jinja expressions are evaluated. While this doesn't grant code execution yet, it confirms SSTI is possible and sets the stage for crafting a more advanced payload.
+
+After confirming basic SSTI, we attempted to escalate by replacing `{{7*7}}` with `{{ ''.__class__ }}` to access object metadata—common in SSTI exploitation. However, the server returned an `"Illegal template"` error.
+
+Investigating the source code, we found the error originates from the `render_template` function in `frappe/utils/jinja.py`. Specifically, line `74` blocks any template containing `".__"` if `safe_render` is `True`, which is the default. This is a security measure to prevent access to Python internals often used in SSTI exploits.
+
+```python
+def render_template(template, context, is_path=None, safe_render=True):
+    '''Render a template using Jinja
+
+    :param template: path or HTML containing the jinja template
+    :param context: dict of properties to pass to the template
+    :param is_path: (optional) assert that the `template` parameter is a path
+    :param safe_render: (optional) prevent server side scripting via jinja templating
+    '''
+
+    from frappe import get_traceback, throw
+    from jinja2 import TemplateError
+
+    if not template:
+        return ""
+
+    # if it ends with .html then it's a path, not raw HTML
+    if (is_path
+            or template.startswith("templates/")
+            or (template.endswith('.html') and '\n' not in template)):
+        return get_jenv().get_template(template).render(context)
+    else:
+        if safe_render and ".__" in template:
+            throw("Illegal template")
+        try:
+            return get_jenv().from_string(template).render(context)
+        except TemplateError:
+            throw(
+                title="Jinja Template Error",
+                msg="<pre>{template}</pre><pre>{tb}</pre>".format(
+                    template=template,
+                    tb=get_traceback()
+                )
+            )
+```
+
+To bypass this filter and reach line `77`—where the Jinja environment renders user input—we’ll need to craft a payload that avoids using `".__"` directly, possibly by using alternative traversal methods or by finding a code path where `safe_render=False`.

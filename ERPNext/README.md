@@ -337,3 +337,5 @@ We can find the `subprocess` class on line `421` (your result might vary). Let's
 {{ subclasses_r[420] }}
 ```
 Rendering this function returns the `subprocess.Popen` class.
+
+#### Gaining Remote Command Execution

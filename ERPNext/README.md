@@ -298,3 +298,4 @@ def render_template(template, context, is_path=None, safe_render=True):
 ```
 
 To bypass this filter and reach line `77`—where the Jinja environment renders user input—we’ll need to craft a payload that avoids using `".__"` directly, possibly by using alternative traversal methods or by finding a code path where `safe_render=False`.
+#### SSTI Filter Evasion

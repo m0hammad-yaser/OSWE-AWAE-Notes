@@ -247,10 +247,10 @@ We should now be able to log in as the administrator user (`zeljka.k@randomdomai
 ### SSTI to Command Execution
 With admin access via SQL injection, the next step is to attempt remote code execution. Since Frappe extensively uses the Jinja1 templating engine—especially in ERPNext's email templates—Server Side Template Injection (SSTI) becomes a promising attack vector. To proceed, it's essential to understand how templating engines work and how they can be exploited.
 
-Templating engines render dynamic content based on user context—for example, displaying `"Hello, Guest"` or `"Hello, Username"` in a header. They help separate views from logic in the MVC model and support reusable content.
+Templating engines render stitic pages  dynamically based on user context, for example, displaying `"Hello, Guest"` or `"Hello, Username"` depends on if the user is authentication or not. They help separate views from logic in the MVC model and support reusable content.
 
 These engines use delimiters to define template blocks. In Jinja (and Python), `{{ }}` denotes expressions (e.g., `{{ 7*7 }}`), and `{% %}` denotes statements (e.g., `{% print("hello") %}`).
 
-Espression: Combination of variables and operations that results in a value. (e.g, `{{7*7}}`)
+- Espression: Combination of variables and operations that results in a value. (e.g, `{{7*7}}`)
 
-Statement: represent an action. (e.g, `print("Hello, World!")`)
+- Statement: represent an action. (e.g, `print("Hello, World!")`)

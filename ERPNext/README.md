@@ -245,3 +245,4 @@ http://erpnext:8000/update-password?key=aAJTVmS14sCpKxrRT8N7ywbnYXRcVEN0
 If we type in a new password, we should receive a `"Password Updated"` message!
 We should now be able to log in as the administrator user (`zeljka.k@randomdomain.com`) using our new password.
 ### SSTI to Command Execution
+With admin access via SQL injection, the next step is to attempt remote code execution. Since Frappe extensively uses the Jinja1 templating engine—especially in ERPNext's email templates—Server Side Template Injection (SSTI) becomes a promising attack vector. To proceed, it's essential to understand how templating engines work and how they can be exploited.

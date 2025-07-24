@@ -252,3 +252,7 @@ These engines use delimiters to define template blocks. In Jinja (and Python), `
 - **Espression:** Combination of variables and operations that results in a value. (e.g, `{{7*7}}`)
 
 - **Statement:** represent an action. (e.g, `{% print("hello") %}`)
+#### Discovering the Rendering Function 
+Since ERPNext email templates use Jinja, we searched for `"template"` while logged in as admin and found the `"Email Template List"` page. Using Burp to capture traffic, we created a new email template titled `"Hacking with SSTI"` and inserted a basic SSTI payload `{{7*7}}` in the response field.
+
+When we used this template to compose a fake email, the output displayed `"49"`, confirming that Jinja expressions are evaluated. While this doesn't grant code execution yet, it confirms SSTI is possible and sets the stage for crafting a more advanced payload.

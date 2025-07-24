@@ -155,3 +155,15 @@ A SQL injection payload was crafted: `offsec_scope" UNION ALL SELECT 1,2,3,4,5#`
 The successful response confirmed injection, mapping returned fields to the five selected values. Further payloads (e.g., replacing `5` with `@@version`) extracted database details: `10.2.24-MariaDB-10.2.24+maria~xenial-log`
 This confirmed the vulnerability, enabling further exploitation to escalate privileges.
 #### SQLI Exploitation -- Authentication Bypass
+With SQL injection confirmed, the goal shifts to privilege escalation—specifically, logging in as the administrator. Since `PyMySQL` does not support stacked queries without `multi=True` (which isn't used), we are limited to read-only `SELECT` injections.
+
+Frappe uses `PBKDF2` for password hashing, making password cracking difficult. A more viable path is hijacking the password reset token.
+
+Frappe’s documentation shows that login data is stored in the `__Auth` table, but it does not store password reset keys. To locate the correct table, we trigger a password reset request using the email `token_searchForUserTable@mail.com`, while monitoring the MySQL logs.
+
+The logs reveal a query to:
+```log
+frappe@ubuntu:~$ sudo tail -f /var/log/mysql/mysql.log | grep token_searchForUserTable
+  4980 Query     select * from `tabUser` where `name` = 'token_searchForUserTable@mail.com' order by modified desc
+```
+This confirms that password reset tokens are stored in the `tabUser` table, which becomes the next target for exploitation.

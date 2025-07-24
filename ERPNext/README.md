@@ -249,7 +249,7 @@ Templating engines render stitic pages  dynamically based on user context, for e
 
 These engines use delimiters to define template blocks. In Jinja (and Python), `{{ }}` denotes expressions (e.g., `{{ 7*7 }}`), and `{% %}` denotes statements (e.g., `{% print("hello") %}`).
 
-- **Espression:** Combination of variables and operations that results in a value. (e.g, `{{7*7}}`)
+- **Expression:** Combination of variables and operations that results in a value. (e.g, `{{7*7}}`)
 
 - **Statement:** represent an action. (e.g, `{% print("hello") %}`)
 #### Discovering the Rendering Function 

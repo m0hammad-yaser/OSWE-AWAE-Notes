@@ -244,3 +244,4 @@ http://erpnext:8000/update-password?key=aAJTVmS14sCpKxrRT8N7ywbnYXRcVEN0
 ```
 If we type in a new password, we should receive a `"Password Updated"` message!
 We should now be able to log in as the administrator user (`zeljka.k@randomdomain.com`) using our new password.
+### SSTI to Command Execution

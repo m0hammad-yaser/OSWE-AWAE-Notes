@@ -311,3 +311,12 @@ List all available classes:
 {% set subclasses_r = mro_r[1]|attr(subclasses)() %}
 {{ subclasses_r }}
 ```
+Rendering the template executes the `__subclasses__` method and returns a long list of classes that are available to us.
+
+To clean up the list of class objects in Visual Studio Code for easier reading:
+1. Copy the entire list, starting from <class 'list'> to the last class object.
+2. Open the `"Find and Replace"` dialog with `Ctrl + H`.
+3. In the `"Find"` field, enter: `,\ `
+4. In the `"Replace"` field: Press `Shift + Enter` to insert a newline character.
+5. Click `"Replace All"`.
+

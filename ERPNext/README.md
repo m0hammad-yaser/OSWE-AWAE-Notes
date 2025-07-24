@@ -135,3 +135,5 @@ sudo tail -f /var/log/mysql/mysql.log
 ```
 ### SQLI Authentication Bypass
 Now that we have a list of endpoints accessible to unauthenticated users, we can start searching for vulnerabilities. A good approach is to identify functions that break the MVC or metadata-driven pattern—specifically, controllers that directly modify the model or view. Searching for SQL queries in these whitelisted functions (e.g., `whitelist(allow_guest=True)`) may help reveal issues.
+
+By searching for SQL in the `91` guest-whitelisted endpoints, we quickly identify the `web_search` function in `apps/frappe/frappe/utils/global_search.py`. To test it in Repeater, we set the request's `cmd` to `frappe.utils.global_search.web_search` and pass the required `text` parameter (e.g., `text=offsec`) after an ampersand (`&`) in the Burp request.

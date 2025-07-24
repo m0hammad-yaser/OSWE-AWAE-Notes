@@ -357,3 +357,5 @@ Using SSH, we verify that the file was created:
 frappe@ubuntu:~$ ls -lh /tmp/das-ist-walter 
 -rw-rw-r-- 1 frappe frappe 0 Jan 11 10:31 das-ist-walter
 ```
+
+It worked! We can now execute commands against the ERPNext system.

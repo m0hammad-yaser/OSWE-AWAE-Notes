@@ -320,3 +320,20 @@ To clean up the list of class objects in Visual Studio Code for easier reading:
 4. In the `"Replace"` field: Press `Shift + Enter` to insert a newline character.
 5. Click `"Replace All"`.
 
+This provides a pre-numbered list, making it easier to find the index number to use when we need to reference it in the payload.
+
+One of the classes that seems interesting is `subprocess.Popen`. The `subprocess` class allows us to "spawn new processes, connect to their input/output/error pipes, and obtain their return codes". This class is very useful when attempting to gain code execution.
+
+We can find the `subprocess` class on line `421` (your result might vary). Let's attempt to access index `420` (Python indexes start at `0`) and inspect the result by appending `"[420]"` to the payload.
+
+```python
+{% set string = "ssti" %}
+{% set class = "__class__" %}
+{% set mro = "__mro__" %}
+{% set subclasses = "__subclasses__" %}
+
+{% set mro_r = string|attr(class)|attr(mro) %}
+{% set subclasses_r = mro_r[1]|attr(subclasses)() %}
+{{ subclasses_r[420] }}
+```
+Rendering this function returns the `subprocess.Popen` class.

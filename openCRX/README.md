@@ -1,0 +1,2 @@
+# openCRX Authentication Bypass and Remote Code Execution
+This module covers the analysis and exploitation of multiple vulnerabilities in openCRX, an open-source Java-based CRM application. Using white box techniques, we exploited **predictable password reset tokens** to gain authenticated access. From there, we combined white and black box approaches to exploit an XXE vulnerability, enumerate the server, extract **HSQLDB credentials**, and leverage Java routines to achieve limited **remote code execution** and deploy a web shell on the server.

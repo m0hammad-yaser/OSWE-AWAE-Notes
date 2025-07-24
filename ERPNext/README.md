@@ -253,4 +253,4 @@ These engines use delimiters to define template blocks. In Jinja (and Python), `
 
 - **Espression:** Combination of variables and operations that results in a value. (e.g, `{{7*7}}`)
 
-- **Statement:** represent an action. (e.g, `print("Hello, World!")`)
+- **Statement:** represent an action. (e.g, `{% print("hello") %}`)

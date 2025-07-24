@@ -359,3 +359,5 @@ frappe@ubuntu:~$ ls -lh /tmp/das-ist-walter
 ```
 
 It worked! We can now execute commands against the ERPNext system.
+
+**Exploitation Script:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/ERPNext/cmd_exec.py

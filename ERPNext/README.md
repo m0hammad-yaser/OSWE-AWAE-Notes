@@ -133,3 +133,5 @@ Monitor queries in real time:
 ```
 sudo tail -f /var/log/mysql/mysql.log
 ```
+### SQLI Authentication Bypass
+Now that we have a list of endpoints accessible to unauthenticated users, we can start searching for vulnerabilities. A good approach is to identify functions that break the MVC or metadata-driven pattern—specifically, controllers that directly modify the model or view. Searching for SQL queries in these whitelisted functions (e.g., `whitelist(allow_guest=True)`) may help reveal issues.

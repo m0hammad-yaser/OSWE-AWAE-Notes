@@ -94,6 +94,6 @@ drwxr-xr-x  2 kali kali     4096 Jan  2  2019 META-INF
 -rw-r--r--  1 kali kali     2036 Jan  2  2019 opencrx-vcard-CRX.war
 -rw-r--r--  1 kali kali     2029 Jan  2  2019 opencrx-webdav-CRX.war
 ```
-As we suspected earlier, the EAR file did contain the WAR files. Each WAR file is essentially a separate web application with its own static content. The common JAR files are in /APP-INF/lib.
+As we suspected earlier, the EAR file did contain the WAR files. Each WAR file is essentially a separate web application with its own static content. The common JAR files are in `/APP-INF/lib`.
 
-We will come back to these JAR files. First, let's examine the main application, opencrx-core-CRX.war, in JD-GUI.
+We will come back to these JAR files. First, let's examine the main application, `opencrx-core-CRX.war`, in JD-GUI.

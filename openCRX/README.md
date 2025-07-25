@@ -314,7 +314,7 @@ call writeBytesToFilename('test.txt', cast ('497420776f726b656421' AS VARBINARY(
 ```
 If everything works, we'll find a new file named `test.txt` in the database's working directory. We can call our `systemprop` function again to receive the working directory.
 
-Check system properties1 by calling the Java `System.getProperty()` method.
+Check system properties by calling the Java `System.getProperty()` method.
 ```sql
  CREATE FUNCTION systemprop(IN key VARCHAR) RETURNS VARCHAR 
   LANGUAGE JAVA 
@@ -327,4 +327,8 @@ VALUES(systemprop('user.dir'))
 Output:
 ```
 /home/student/ctx/data/hsqldb
+```
+```bash
+@opencrx:~/crx/data/hsqldb$ cat test.txt 
+It worked!student@opencrx:~/crx/data/hsqldb$
 ```

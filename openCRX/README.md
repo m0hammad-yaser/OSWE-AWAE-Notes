@@ -299,3 +299,4 @@ $ java -cp ~/hsqldb-2.7.4/hsqldb/lib/hsqldb.jar org.hsqldb.util.DatabaseManagerS
 ```
 After a few moments, a new GUI window should open.
 - **Exploitation Script:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/xxe_lfd.py
+## Remote Code Execution

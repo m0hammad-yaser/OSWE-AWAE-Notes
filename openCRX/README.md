@@ -301,3 +301,4 @@ After a few moments, a new GUI window should open.
 
 **Exploitation Script:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/xxe_lfd.py
 ## Remote Code Execution
+### Writing to the file system

@@ -226,3 +226,5 @@ Now we can compile our token generator using: `javac OpenCRXToken.java`
 
 Then run it: `java OpenCRXToken <start_timestamp> <stop_timestamp> > tokens.txt`
 ### Automating Resets
+Script: https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/xxe_lfd.py#L20C21-L20C21
+## XML External Entity Vulnerability

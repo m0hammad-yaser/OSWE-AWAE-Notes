@@ -99,3 +99,34 @@ As we suspected earlier, the EAR file did contain the WAR files. Each WAR file i
 We will come back to these JAR files. First, let's examine the main application, `opencrx-core-CRX.war`, in JD-GUI.
 
 We start with JSP files rather than web.xml because openCRX embeds key logic and functionality directly within them. This approach allows for faster identification of dynamic behavior and potential vulnerabilities without tracing servlet mappings.
+
+### Password Reset Analysis
+While analyzing the WAR file in JD-GUI, we identified JSP files related to authentication and password resets. Since these areas often contain vulnerabilities that can lead to unauthorized access, we focus first on `RequestPasswordReset.jsp` to understand how openCRX handles password resets and assess it for potential exploitation.
+
+The file also contains additional application logic. The application code that handles password resets starts near the end of the file, around line `153`.
+```java
+		if(principalName != null && providerName != null && segmentName != null) {
+			javax.jdo.PersistenceManagerFactory pmf = org.opencrx.kernel.utils.Utils.getPersistenceManagerFactory();
+			javax.jdo.PersistenceManager pm = pmf.getPersistenceManager(
+				SecurityKeys.ADMIN_PRINCIPAL + SecurityKeys.ID_SEPARATOR + segmentName, 
+				null
+			);
+			try {
+				org.opencrx.kernel.home1.jmi1.UserHome userHome = (org.opencrx.kernel.home1.jmi1.UserHome)pm.getObjectById(
+					new Path("xri://@openmdx*org.opencrx.kernel.home1").getDescendant("provider", providerName, "segment", segmentName, "userHome", principalName)
+				);
+				pm.currentTransaction().begin();
+				userHome.requestPasswordReset();
+				pm.currentTransaction().commit();
+				success = true;
+			} catch(Exception e) {
+				try {
+					pm.currentTransaction().rollback();
+				} catch(Exception ignore) {}
+				success = false;
+			}
+		} else {
+			success = false;
+		}
+
+```

@@ -335,6 +335,7 @@ It worked!student@opencrx:~/crx/data/hsqldb$
 ```
 ### Writing Webshell
 Now that we know where to write our files, we can use our `writeBytesToFilename` procedure to write a JSP command shell. If everything works, we should be able to access it from our browser.
+
 **Webshell:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/cmdjsp.jsp
 
 We will use the `Decoder` tool in BurpSuite again to convert the contents of our JSP webshell into ASCII hex. Once we have the converted value, we can call `writeBytesToFilename` and use a relative path to the `opencrx-core-CRX` directory with our shell filename.

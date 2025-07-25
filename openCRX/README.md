@@ -279,3 +279,4 @@ We want to use this vulnerability to find files that can provide us with additio
   <firstName>Tom</firstName>
 </org.opencrx.kernel.account1.Contact>
 ```
+A JDBC connection string in the file with a value of `"jdbc:hsqldb:hsql://127.0.0.1:9001/CRX"` lists a username of `"sa"` and a password of `"manager99"`. The application appears to be using HSQLDB, a Java database.

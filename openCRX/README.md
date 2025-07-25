@@ -130,3 +130,8 @@ The file also contains additional application logic. The application code that h
 		}
 
 ```
+To trace the password reset logic in openCRX, we examined a code block where execution depends on `principalName`, `providerName`, and `segmentName` being non-null. The code uses these values to retrieve a `UserHome` object and then calls its `requestPasswordReset` method.
+
+Since the `UserHome` class wasn't found in the current WAR file (no clickable link in JD-GUI), we checked the `application.xml` file inside the EAR’s `META-INF` directory. It revealed that external libraries are located in `APP-INF/lib`.
+
+Based on this, we conclude the `UserHome` class is likely inside `opencrx-kernel.jar`, found in `APP-INF/lib`. We'll examine this JAR next to continue analyzing the password reset mechanism.

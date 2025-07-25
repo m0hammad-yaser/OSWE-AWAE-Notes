@@ -98,7 +98,7 @@ As we suspected earlier, the EAR file did contain the WAR files. Each WAR file i
 
 We will come back to these JAR files. First, let's examine the main application, `opencrx-core-CRX.war`, in JD-GUI.
 
-We start with JSP files rather than web.xml because openCRX embeds key logic and functionality directly within them. This approach allows for faster identification of dynamic behavior and potential vulnerabilities without tracing servlet mappings.
+We start with JSP files rather than `web.xml` because openCRX embeds key logic and functionality directly within them. This approach allows for faster identification of dynamic behavior and potential vulnerabilities without tracing servlet mappings.
 
 ### Password Reset Analysis
 While analyzing the WAR file in JD-GUI, we identified JSP files related to authentication and password resets. Since these areas often contain vulnerabilities that can lead to unauthorized access, we focus first on `RequestPasswordReset.jsp` to understand how openCRX handles password resets and assess it for potential exploitation.

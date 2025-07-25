@@ -298,5 +298,5 @@ The database port appears to be open and we have credentials, so let's try conne
 $ java -cp ~/hsqldb-2.7.4/hsqldb/lib/hsqldb.jar org.hsqldb.util.DatabaseManagerSwing --url jdbc:hsqldb:hsql://opencrx:9001/CRX --user sa --password manager99
 ```
 After a few moments, a new GUI window should open.
-- **Exploitation Script:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/xxe_lfd.py
+**Exploitation Script:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/xxe_lfd.py
 ## Remote Code Execution

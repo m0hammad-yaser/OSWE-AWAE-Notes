@@ -187,3 +187,5 @@ $ python3 -c "import time; print(int(time.time() * 1000))"
 1753476249633
 ```
 This format will match the output of the Java method in milliseconds.
+
+To determine the seed range for generating the correct password reset token, we can use the `int(time.time() * 1000)` command immediately before and after sending the reset request with `requests`. This gives us the range of possible `System.currentTimeMillis()` values.

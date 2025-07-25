@@ -194,7 +194,7 @@ To exploit the predictable token generation in openCRX, you’ll need to write a
 ```java
 /*
 Compile before usage: javac OpenCRXToken.java
-Usage: java OpenCRXToken <start_timestamp> <stop_timestamp>
+Usage: java OpenCRXToken <start_timestamp> <stop_timestamp> > tokens.txt
 */
 import java.util.Random;
 public class OpenCRXToken {
@@ -224,4 +224,4 @@ public class OpenCRXToken {
 ```
 Now we can compile our token generator using: `javac OpenCRXToken.java`
 
-Then run it: `java OpenCRXToken <start_timestamp> <stop_timestamp>`
+Then run it: `java OpenCRXToken <start_timestamp> <stop_timestamp> > tokens.txt`

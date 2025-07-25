@@ -135,3 +135,36 @@ To trace the password reset logic in openCRX, we examined a code block where exe
 Since the `UserHome` class wasn't found in the current WAR file (no clickable link in JD-GUI), we checked the `application.xml` file inside the EAR’s `META-INF` directory. It revealed that external libraries are located in `APP-INF/lib`.
 
 Based on this, we conclude the `UserHome` class is likely inside `opencrx-kernel.jar`, found in `APP-INF/lib`. We'll examine this JAR next to continue analyzing the password reset mechanism.
+
+The `getRandomBase62` method used for generating password reset tokens in openCRX is insecure due to predictable randomness.
+
+The `requestPasswordReset` function ultimately generates a reset token using:
+```java
+324 public void requestPasswordReset(UserHome userHome) throws ServiceException {
+...   
+336     String webAccessUrl = userHome.getWebAccessUrl();
+337     if (webAccessUrl != null) {
+338       String resetToken = Utils.getRandomBase62(40);
+...       
+341       String name = providerName + "/" + segmentName + " Password Reset";
+342       String resetConfirmUrl = webAccessUrl + (webAccessUrl.endsWith("/") ? "" : "/") + "PasswordResetConfirm.jsp?t=" + resetToken + "&p=" + providerName + "&s=" + segmentName + "&id=" + principalName;
+343       String resetCancelUrl = webAccessUrl + (webAccessUrl.endsWith("/") ? "" : "/") + "PasswordResetCancel.jsp?t=" + resetToken + "&p=" + providerName + "&s=" + segmentName + "&id=" + principalName;
+...     
+363       changePassword((Password)loginPrincipal
+364           .getCredential(), null, "{RESET}" + resetToken);
+365     } 
+366   }
+```
+the key issue from `getRandomBase62` is that `java.util.Random` is not cryptographically secure:
+```java
+1038   public static String getRandomBase62(int length) {
+1039      String alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+1040     Random random = new Random(System.currentTimeMillis());
+1041     String s = "";
+1042     for (int i = 0; i < length; i++) {
+1043       s = s + "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".charAt(random.nextInt(62));
+1044     }
+1045     return s;
+1046   }
+```
+Seeding it with `System.currentTimeMillis()` makes it deterministic and predictable—an attacker could guess the seed value if they know the approximate time the token was generated.

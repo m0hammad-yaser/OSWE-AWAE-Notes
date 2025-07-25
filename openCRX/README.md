@@ -65,7 +65,7 @@ use scp to copy opencrx-core-CRX.ear to our local Kali machine.
 ```bash
 scp student@opencrx:~/crx/apache-tomee-plus-7.0.5/apps/opencrx-core-CRX.ear .
 ```
-Next, we'll unzip it, passing in -d opencrx to extract the contents into a new directory.
+Next, we'll unzip it, passing in `-d` opencrx to extract the contents into a new directory.
 ```bash
 unzip -q opencrx-core-CRX.ear -d opencrx
 ```

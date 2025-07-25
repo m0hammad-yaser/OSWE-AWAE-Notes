@@ -179,3 +179,4 @@ A default installation of openCRX has three accounts with the following username
 2. `admin-Standard` / `admin-Standard`
 3. `admin-Root` / `admin-Root`
 ### Timing the reset request
+To generate the correct password reset token, we need to guess the exact millisecond the token was created, since that's the seed used by `System.currentTimeMillis()`. Fortunately, the method returns time in UTC, so time zone differences aren’t a concern.

@@ -61,7 +61,7 @@ We confirmed that openCRX is packaged as an EAR file located at: `/home/student/
 
 Inside, we found multiple WAR files, each representing a separate web application, eliminating the need to extract them individually.
 
-use scp to copy opencrx-core-CRX.ear to our local Kali machine.
+use `scp` to copy `opencrx-core-CRX.ear` to our local Kali machine.
 ```bash
 scp student@opencrx:~/crx/apache-tomee-plus-7.0.5/apps/opencrx-core-CRX.ear .
 ```

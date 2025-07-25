@@ -169,3 +169,4 @@ the key issue from `getRandomBase62` is that `java.util.Random` is not cryptogra
 ```
 Seeding it with `System.currentTimeMillis()` makes it deterministic and predictable—an attacker could guess the seed value if they know the approximate time the token was generated.
 ### When Random Isn't
+The standard Java libraries have two primary random number generators: `java.util.Random` and `java.security.SecureRandom` The names are somewhat of a giveaway here.

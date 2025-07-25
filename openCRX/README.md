@@ -97,3 +97,5 @@ drwxr-xr-x  2 kali kali     4096 Jan  2  2019 META-INF
 As we suspected earlier, the EAR file did contain the WAR files. Each WAR file is essentially a separate web application with its own static content. The common JAR files are in `/APP-INF/lib`.
 
 We will come back to these JAR files. First, let's examine the main application, `opencrx-core-CRX.war`, in JD-GUI.
+
+We start with JSP files rather than web.xml because openCRX embeds key logic and functionality directly within them. This approach allows for faster identification of dynamic behavior and potential vulnerabilities without tracing servlet mappings.

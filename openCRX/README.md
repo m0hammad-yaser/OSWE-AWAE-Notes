@@ -57,3 +57,43 @@ student@opencrx:~/crx/apache-tomee-plus-7.0.5$ tree -L 3
 
 55 directories, 339 files
 ```
+We confirmed that openCRX is packaged as an EAR file located at: `/home/student/crx/apache-tomee-plus-7.0.5/apps/opencrx-core-CRX.ear`
+
+Inside, we found multiple WAR files, each representing a separate web application, eliminating the need to extract them individually.
+
+use scp to copy opencrx-core-CRX.ear to our local Kali machine.
+```bash
+scp student@opencrx:~/crx/apache-tomee-plus-7.0.5/apps/opencrx-core-CRX.ear .
+```
+Next, we'll unzip it, passing in -d opencrx to extract the contents into a new directory.
+```bash
+unzip -q opencrx-core-CRX.ear -d opencrx
+```
+Once we have extracted the contents of the EAR file, we can examine them on our Kali machine.
+```bash
+kali@kali:~$ cd opencrx
+
+kali@kali:~/opencrx$ ls -al
+total 29184
+drwxr-xr-x  4 kali kali     4096 Feb 27 14:19 .
+drwxr-xr-x 51 kali kali     4096 Feb 27 14:19 ..
+drwxr-xr-x  3 kali kali     4096 Jan  2  2019 APP-INF
+drwxr-xr-x  2 kali kali     4096 Jan  2  2019 META-INF
+-rw-r--r--  1 kali kali     2028 Jan  2  2019 opencrx-bpi-CRX.war
+-rw-r--r--  1 kali kali     2027 Jan  2  2019 opencrx-caldav-CRX.war
+-rw-r--r--  1 kali kali  3908343 Jan  2  2019 opencrx-calendar-CRX.war
+-rw-r--r--  1 kali kali     2030 Jan  2  2019 opencrx-carddav-CRX.war
+-rw-r--r--  1 kali kali  3675357 Jan  2  2019 opencrx-contacts-CRX.war
+-rw-r--r--  1 kali kali 18285302 Jan  2  2019 opencrx-core-CRX.war
+-rw-r--r--  1 kali kali  1099839 Jan  2  2019 opencrx-documents-CRX.war
+-rw-r--r--  1 kali kali     2750 Jan  2  2019 opencrx-ical-CRX.war
+-rw-r--r--  1 kali kali     1785 Jan  2  2019 opencrx-imap-CRX.war
+-rw-r--r--  1 kali kali     1788 Jan  2  2019 opencrx-ldap-CRX.war
+-rw-r--r--  1 kali kali  2778171 Jan  2  2019 opencrx-rest-CRX.war
+-rw-r--r--  1 kali kali    70520 Jan  2  2019 opencrx-spaces-CRX.war
+-rw-r--r--  1 kali kali     2036 Jan  2  2019 opencrx-vcard-CRX.war
+-rw-r--r--  1 kali kali     2029 Jan  2  2019 opencrx-webdav-CRX.war
+```
+As we suspected earlier, the EAR file did contain the WAR files. Each WAR file is essentially a separate web application with its own static content. The common JAR files are in /APP-INF/lib.
+
+We will come back to these JAR files. First, let's examine the main application, opencrx-core-CRX.war, in JD-GUI.

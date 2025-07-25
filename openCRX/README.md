@@ -284,14 +284,14 @@ A JDBC connection string in the file with a value of `"jdbc:hsqldb:hsql://127.0.
 let's do a quick `nmap` scan to find out if TCP port `9001` is open.
 ```bash
 kali@kali:~/opencrx$ nmap -p 9001 opencrx
-Starting Nmap 7.80 ( https://nmap.org ) at 2020-02-17 10:37 CST
-Nmap scan report for opencrx(192.168.121.126)
-Host is up (0.00047s latency).
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-25 17:43 EDT
+Nmap scan report for opencrx(192.168.215.126)
+Host is up (0.00058s latency).
 
 PORT     STATE SERVICE
 9001/tcp open  tor-orport
 
-Nmap done: 1 IP address (1 host up) scanned in 0.05 seconds
+Nmap done: 1 IP address (1 host up) scanned in 0.06 seconds
 ```
 The database port appears to be open and we have credentials, so let's try connecting to the database and determine what we can do with it.
 ```bash

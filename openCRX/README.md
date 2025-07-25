@@ -225,3 +225,4 @@ public class OpenCRXToken {
 Now we can compile our token generator using: `javac OpenCRXToken.java`
 
 Then run it: `java OpenCRXToken <start_timestamp> <stop_timestamp> > tokens.txt`
+### Automating Resets

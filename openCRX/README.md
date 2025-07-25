@@ -170,3 +170,11 @@ the key issue from `getRandomBase62` is that `java.util.Random` is not cryptogra
 Seeding it with `System.currentTimeMillis()` makes it deterministic and predictable—an attacker could guess the seed value if they know the approximate time the token was generated.
 ### When Random Isn't
 The standard Java libraries have two primary random number generators: `java.util.Random` and `java.security.SecureRandom` The names are somewhat of a giveaway here.
+
+The openCRX application uses `java.util.Random` seeded with `System.currentTimeMillis()` to generate password reset tokens, making them predictable. If an attacker can estimate when a token was generated, they can reproduce the token by seeding their own Random object with similar timestamps. This could allow brute-forcing of valid tokens—especially if there are no rate limits or lockouts. However, a valid user account is still needed as a target.
+
+A default installation of openCRX has three accounts with the following username and password pairs:
+
+1. `guest` / `guest`
+2. `admin-Standard` / `admin-Standard`
+3. `admin-Root` / `admin-Root`

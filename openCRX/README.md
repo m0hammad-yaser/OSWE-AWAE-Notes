@@ -248,7 +248,7 @@ Authorization: Basic Z3Vlc3Q6TmV3UGFzc3dvcmQhMTIzNA==
   <firstName>Tom</firstName>
 </org.opencrx.kernel.account1.Contact>
 ```
-**Interestingly**, the `file:///` wrapper can reference files and directories. If we modify our XXE payload to reference directories instead of files, it should return directory listings. We can use this to enumerate directories and files on the server.
+**Interestingly**, the `file:///` wrapper can reference files and directories. If we modify our XXE payload to reference directories instead of files, it should return **directory listings**. We can use this to enumerate directories and files on the server.
 ```xml
 <?xml version="1.0"?>
 <!DOCTYPE data [

@@ -30,3 +30,17 @@ CORS uses HTTP headers to tell browsers which origins can access resources from 
 **Request Types and Preflight**
 - Simple requests: (standard `GET`, `HEAD`, `POST` with basic `content-types`) are sent directly, but the response is blocked if CORS headers don't allow it.
 - Complex requests: (custom headers, non-standard `content-types`, or non-standard methods) trigger a preflight `OPTIONS` request first. The browser checks if the actual request is allowed before sending it.
+
+**Security Implications**
+
+*Vulnerable Configurations:*
+
+1. Dynamic Origin Reflection: Setting `Access-Control-Allow-Origin` to match the requesting origin allows any site to make authenticated requests
+2. Null Origin: Allowing `"null"` origin can be exploited by certain documents/files
+3. Wildcard with Credentials: Not possible - wildcard (`*`) requires credentials to be `false`
+
+*Secure Configuration:*
+
+Only set `Access-Control-Allow-Origin` to trusted, specific origins. Remove the header entirely if cross-origin access isn't needed.
+
+The main security risk occurs when sites dynamically set the allowed origin to match any requesting origin while allowing credentials, enabling malicious sites to make authenticated requests on behalf of users.

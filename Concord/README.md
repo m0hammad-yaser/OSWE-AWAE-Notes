@@ -176,7 +176,7 @@ function rce() {
 ```
 
 #### Attack Execution
-1. **Setup**: Start netcat listener on port 9000
+1. **Setup**: Start netcat listener on port `9000`
 2. **Deliver**: Send malicious website link to authenticated Concord user
 3. **Execute**: When user visits the page:
    - JavaScript checks authentication status

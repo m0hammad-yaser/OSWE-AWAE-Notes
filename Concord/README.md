@@ -211,7 +211,7 @@ Even with modern browsers reducing CSRF vulnerabilities, applications like Conco
 - Migrations initialize/update database schema and data
 
 ##### 2. Locating Migration Files
-- Navigating closer to the root of this folder (server/db/src/main/) and analyze the folder structure.
+- Navigating closer to the root of this folder (`server/db/src/main/`) and analyze the folder structure.
   ```bash
   kali@kali:~/concord$ cd server/db/src/main/
   kali@kali:~/concord/server/db/src/main$ tree

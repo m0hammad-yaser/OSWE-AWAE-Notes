@@ -21,17 +21,17 @@ The purpose of SOP is not to prevent the request for a resource from being sent,
 ### Cross-Origin Resource Sharing (CORS)
 CORS uses HTTP headers to tell browsers which origins can access resources from a server. It works alongside the Same-Origin Policy (SOP) to control cross-origin requests.
 
-**Key CORS Headers**
+#### Key CORS Headers
 
 - `Access-Control-Allow-Origin`: Specifies which origins can access the response
 - `Access-Control-Allow-Credentials`: Indicates if cookies can be included in requests
 - `Access-Control-Expose-Headers`: Lists headers that JavaScript can access
 
-**Request Types and Preflight**
+#### Request Types and Preflight
 - Simple requests: (standard `GET`, `HEAD`, `POST` with basic `content-types`) are sent directly, but the response is blocked if CORS headers don't allow it.
 - Complex requests: (custom headers, non-standard `content-types`, or non-standard methods) trigger a preflight `OPTIONS` request first. The browser checks if the actual request is allowed before sending it.
 
-**Security Implications**
+#### Security Implications
 
 *Vulnerable Configurations:*
 
@@ -44,3 +44,36 @@ CORS uses HTTP headers to tell browsers which origins can access resources from 
 Only set `Access-Control-Allow-Origin` to trusted, specific origins. Remove the header entirely if cross-origin access isn't needed.
 
 The main security risk occurs when sites dynamically set the allowed origin to match any requesting origin while allowing credentials, enabling malicious sites to make authenticated requests on behalf of users.
+### Discovering Unsafe CORS Headers
+
+#### Initial Analysis
+
+The `/api/service/console/whoami` endpoint initially shows:
+- Without Origin header: Response contains Access-Control-Allow-Origin: *
+- This wildcard setting means cookies won't be sent on cross-origin requests
+
+#### Key Discovery
+When an `Origin` header is added to the request:
+1. Server reflects the origin into `Access-Control-Allow-Origin` header
+2. Server adds `Access-Control-Allow-Credentials: true`
+
+**This is a dangerous configuration** - it allows any origin to make authenticated requests.
+
+#### Testing Different Methods
+
+`OPTIONS` requests behave differently:
+
+- The origin is not reflected in the response
+- This limits the vulnerability scope
+
+#### Vulnerability Scope
+
+With this CORS misconfiguration, attackers can only:
+- Read responses from `GET` requests
+- Read responses from standard `POST` requests
+- Cannot perform complex requests (those requiring preflight)
+
+#### Next Consideration
+The **`SameSite` cookie attribute** could provide additional protection against this CORS vulnerability, which needs to be investigated to understand the full attack surface.
+Key Takeaway
+The application has an unsafe CORS configuration that dynamically reflects any origin while allowing credentials, but the vulnerability is somewhat limited due to the `OPTIONS` method behavior.

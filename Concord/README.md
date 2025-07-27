@@ -197,4 +197,6 @@ function rce() {
 5. **Standard content-type**: `multipart/form-data` bypasses preflight requirements
 
 This demonstrates how CORS misconfigurations combined with missing CSRF protections can lead to complete system compromise through social engineering.
+
 **Script sent to the victim:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/Concord/rce.html
+## Authentication Bypass: Round Two - Insecure Defaults

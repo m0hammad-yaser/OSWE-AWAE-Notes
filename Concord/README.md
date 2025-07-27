@@ -278,7 +278,7 @@ curl -H "Authorization: O+JMYwBsU797EKtlRQYu+Q" http://concord:8001/api/v1/apike
 ```
 
 ##### UI Login:
-- Used the API key with `?useApiKey=true` parameter
+- Used the API key with `?useApiKey=true` parameter `http://concord:8001/#/login?useApiKey=true`
 - Successfully logged into the Concord web interface as `concordAgent`
 
 #### Root Cause Analysis
@@ -294,6 +294,3 @@ curl -H "Authorization: O+JMYwBsU797EKtlRQYu+Q" http://concord:8001/api/v1/apike
 - Installation process doesn't regenerate default credentials
 - Migration files are part of source code (visible to attackers)
 - No credential rotation mechanism for default accounts
-
-#### Key Takeaway
-Applications often ship with insecure defaults from the development process. Analyzing database migrations and configuration files can reveal hardcoded credentials that provide immediate access to production systems. This demonstrates why **secure installation procedures** and **credential rotation** are critical security practices.

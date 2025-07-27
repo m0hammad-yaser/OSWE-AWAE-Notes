@@ -206,12 +206,37 @@ Even with modern browsers reducing CSRF vulnerabilities, applications like Conco
 
 ##### 1. Understanding the Application Boot Process
 - Analyzed `start.sh` startup script
-- Found `MigrateDB` class handles database migrations
+- Found `MigrateDB` class handles database migrations in `server/impl/src/main/java/com/walmartlabs/concord/server/MigrateDB.java`
+- After reviewing this file, we find one of the classes referenced is DatabaseModule in `server/db/src/main/java/com/walmartlabs/concord/db`. The `com/walmartlabs/concord/db` part of the path is the class path.
 - Migrations initialize/update database schema and data
 
 ##### 2. Locating Migration Files
+- Navigating closer to the root of this folder (server/db/src/main/) and analyze the folder structure.
+  ```bash
+  kali@kali:~/concord$ cd server/db/src/main/
+  kali@kali:~/concord/server/db/src/main$ tree
+  .
+  ├── java
+  │   └── com
+  │       └── walmartlabs
+  │           └── concord
+  │               └── db
+  │                   ├── AbstractDao.java
+  │                   ├── DatabaseChangeLogProvider.java
+  ...
+  └── resources
+      └── com
+          └── walmartlabs
+              └── concord
+                  └── server
+                      └── db
+                          ├── liquibase.xml
+                          ├── v0.0.1.xml
+                          ├── v0.12.0.xml
+  ...
+  ```
 - Found migration files in `server/db/src/main/resources/`
-- Uses **Liquibase** for database schema management
+- Uses **`Liquibase`** for database schema management
 - Migration files contain table definitions and **initial data inserts**
 
 ##### 3. Discovering Hardcoded Credentials

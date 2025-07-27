@@ -18,3 +18,14 @@ This table lists some of those resources, indicates whether or not they will loa
 | https://b.com/analytics | Blocked | Different Domain |
 
 The purpose of SOP is not to prevent the request for a resource from being sent, but to prevent JavaScript from reading the response.
+### Cross-Origin Resource Sharing (CORS)
+CORS uses HTTP headers to tell browsers which origins can access resources from a server. It works alongside the Same-Origin Policy (SOP) to control cross-origin requests.
+
+**Key CORS Headers**
+`Access-Control-Allow-Origin`: Specifies which origins can access the response
+`Access-Control-Allow-Credentials`: Indicates if cookies can be included in requests
+`Access-Control-Expose-Headers`: Lists headers that JavaScript can access
+
+**Request Types and Preflight**
+- Simple requests: (standard `GET`, `HEAD`, `POST` with basic `content-types`) are sent directly, but the response is blocked if CORS headers don't allow it.
+- Complex requests: (custom headers, non-standard `content-types`, or non-standard methods) trigger a preflight `OPTIONS` request first. The browser checks if the actual request is allowed before sending it.

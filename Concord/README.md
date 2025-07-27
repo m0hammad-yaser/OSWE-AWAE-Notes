@@ -23,9 +23,9 @@ CORS uses HTTP headers to tell browsers which origins can access resources from 
 
 **Key CORS Headers**
 
-`Access-Control-Allow-Origin`: Specifies which origins can access the response
-`Access-Control-Allow-Credentials`: Indicates if cookies can be included in requests
-`Access-Control-Expose-Headers`: Lists headers that JavaScript can access
+- `Access-Control-Allow-Origin`: Specifies which origins can access the response
+- `Access-Control-Allow-Credentials`: Indicates if cookies can be included in requests
+- `Access-Control-Expose-Headers`: Lists headers that JavaScript can access
 
 **Request Types and Preflight**
 - Simple requests: (standard `GET`, `HEAD`, `POST` with basic `content-types`) are sent directly, but the response is blocked if CORS headers don't allow it.

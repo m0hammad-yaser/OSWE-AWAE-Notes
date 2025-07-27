@@ -207,7 +207,7 @@ Even with modern browsers reducing CSRF vulnerabilities, applications like Conco
 ##### 1. Understanding the Application Boot Process
 - Analyzed `start.sh` startup script
 - Found `MigrateDB` class handles database migrations in `server/impl/src/main/java/com/walmartlabs/concord/server/MigrateDB.java`
-- After reviewing this file, we find one of the classes referenced is DatabaseModule in `server/db/src/main/java/com/walmartlabs/concord/db`. The `com/walmartlabs/concord/db` part of the path is the class path.
+- After reviewing this file, we find one of the classes referenced is `DatabaseModule`, Impelemented in `server/db/src/main/java/com/walmartlabs/concord/db`. The `com/walmartlabs/concord/db` part of the path is the class path.
 - Migrations initialize/update database schema and data
 
 ##### 2. Locating Migration Files

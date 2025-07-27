@@ -114,5 +114,4 @@ The `SameSite` attribute in cookies controls when browsers send cookies with cro
 The combination of permissive CORS headers + missing SameSite attributes + no CSRF tokens suggests the application may be vulnerable to both:
 - **CORS-based attacks** (reading sensitive data)
 - **CSRF attacks** (performing privileged actions)
-
-The next step is investigating what endpoints and actions are available for exploitation.
+### Exploiting Permissive CORS and CSRF to get an RCE

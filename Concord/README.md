@@ -198,7 +198,7 @@ function rce() {
 
 This demonstrates how CORS misconfigurations combined with missing CSRF protections can lead to complete system compromise through social engineering.
 
-**Script sent to the victim:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/Concord/rce.html
+**Script sent to the victim:** https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/Concord/cors_csrf_rce.html
 ## Authentication Bypass: Round Two - Insecure Defaults
 Even with modern browsers reducing CSRF vulnerabilities, applications like Concord can still be vulnerable due to **insecure default configurations** that lead to authentication bypass.
 

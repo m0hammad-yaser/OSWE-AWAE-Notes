@@ -77,3 +77,42 @@ With this CORS misconfiguration, attackers can only:
 The **`SameSite` cookie attribute** could provide additional protection against this CORS vulnerability, which needs to be investigated to understand the full attack surface.
 Key Takeaway
 The application has an unsafe CORS configuration that dynamically reflects any origin while allowing credentials, but the vulnerability is somewhat limited due to the `OPTIONS` method behavior.
+
+### `SameSite` Attribute Overview
+The `SameSite` attribute in cookies controls when browsers send cookies with cross-site requests. It's found in the `Set-Cookie` header and has three possible values.
+
+#### Strict
+- **Most restrictive**: Cookies only sent when user actively navigates within the same website
+- **Blocks**: Embedded images, iframes, and links from other sites
+- **Example**: If you click a link to site.com from another domain, cookies won't be sent
+#### None
+- **Least restrictive**: Cookies sent in all contexts (navigation, images, iframes)
+- **Requires**: `Secure` attribute (HTTPS only)
+- **Risk**: Enables CSRF attacks if no other protections exist
+#### Lax
+- **Moderate**: Cookies sent only for:
+  - Safe HTTP methods (`GET`, `HEAD`, `OPTIONS`)
+  - User-initiated navigation (clicking links, not scripts/images)
+  - 
+### Browser Defaults
+- **Chrome 80+/Edge 86+**: `Lax` (if no `SameSite` set)
+- **Firefox/Safari**: `None` (at time of writing)
+- **Internet Explorer**: No `SameSite` support
+
+### Concord Application Analysis
+#### Findings:
+- Login creates cookies **without `SameSite` attribute**
+- Has **permissive CORS headers**
+- **No CSRF tokens** discovered
+- Default browser behavior varies (`None` or `Lax`)
+#### Security Implications:
+1. **If browser defaults to `None`**: Vulnerable to CSRF attacks
+2. **Combined with CORS misconfiguration**: Can extract CSRF tokens from pages
+3. **Missing CSRF tokens**: No additional protection against state-changing requests
+
+#### Attack Potential
+The combination of permissive CORS headers + missing SameSite attributes + no CSRF tokens suggests the application may be vulnerable to both:
+- **CORS-based attacks** (reading sensitive data)
+- **CSRF attacks** (performing privileged actions)
+
+The next step is investigating what endpoints and actions are available for exploitation.

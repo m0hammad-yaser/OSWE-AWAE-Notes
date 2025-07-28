@@ -22,4 +22,4 @@ RESTful APIs use HTTP methods (verbs) to define actions:
 Though these are standard conventions, implementations can vary. Some services may misuse methods (e.g., using `POST` for deletion) or not support all methods. SOAP APIs, by contrast, use `POST` for all actions, with operations defined as methods like lookupUser.
 
 Because tools often default to `GET` requests, they may miss endpoints requiring other methods. Understanding method behavior is key when exploring or testing APIs.
-
+### Initial Enumeration

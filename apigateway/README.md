@@ -64,5 +64,6 @@ This helped identify three key services worth further testing:
 - files
 - users
 - render
+
 lets save them in a new file called `endpoints_simple.txt`
 ### Advanced Enumeration with Verb Tampering

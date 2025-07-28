@@ -12,3 +12,14 @@ Web service URLs typically follow structured patterns for routing requests. Comm
 
 Some APIs use subdomains for routing, others use path-based patterns. Versioning may appear in the URL or be handled via request headers.
 ## API Discovery via Verb Tampering
+RESTful APIs use HTTP methods (verbs) to define actions:
+
+- `GET` retrieves data (typically read-only).
+- `POST` creates new data or objects.
+- `PUT`/`PATCH` update existing data—`PUT` replaces the whole object; `PATCH` updates parts.
+- `DELETE` removes data.
+
+Though these are standard conventions, implementations can vary. Some services may misuse methods (e.g., using `POST` for deletion) or not support all methods. SOAP APIs, by contrast, use `POST` for all actions, with operations defined as methods like lookupUser.
+
+Because tools often default to `GET` requests, they may miss endpoints requiring other methods. Understanding method behavior is key when exploring or testing APIs.
+

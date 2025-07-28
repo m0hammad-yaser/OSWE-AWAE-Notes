@@ -78,7 +78,7 @@ A Python script was written to:
 - Send both `GET` and `POST` requests to all `/endpoint/action` combinations.
 - Print results for responses not in [`204`, `401`, `403`, `404`].
 
-Output:
+**Output:**
 ```bash
 ┌──(kali㉿kali)-[~]
 └─$ python3 route_buster.py -a /usr/share/wordlists/dirb/small.txt -w endpoints_simple.txt -t http://apigateway:8000 
@@ -95,3 +95,32 @@ Wordlist complete. Goodbye.
 ┌──(kali㉿kali)-[~]
 └─$
 ```
+**Findings:**
+- Several `/users/*` paths returned `200 OK` for `GET`, but no useful content.
+- `/files/import` and `/users/invite` returned `400 Bad Request` for `POST` request instead of HTTP `403 Forbidden`, **suggesting the endpoints are active and expecting input**, but malformed request has been sent.
+- A `POST` to `/files/import` revealed an error: `"url" is required`, indicating the API expects a `url` parameter.
+```bash
+──(kali㉿kali)-[~]
+└─$ curl -i -X POST http://apigateway:8000/files/import             
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=utf-8
+Content-Length: 86
+Connection: keep-alive
+X-Powered-By: Directus
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: Content-Range
+ETag: W/"56-egVc9WbgXViwv0ZIaPJS4bmcvSo"
+Date: Mon, 28 Jul 2025 18:02:05 GMT
+X-Kong-Upstream-Latency: 14
+X-Kong-Proxy-Latency: 1
+Via: kong/2.2.1
+
+{"errors":[{"message":"\"url\" is required","extensions":{"code":"INVALID_PAYLOAD"}}]}                                                                                                                          
+┌──(kali㉿kali)-[~]
+└─$
+```
+- The `/files/import` endpoint is **unauthenticated**, active, and potentially vulnerable to Server-Side Request Forgery (SSRF).
+- Any time we discover an API or web form that includes a `url` parameter, we always want to check it for a Server-Side Request Forgery vulnerability.
+
+## Server-Side Request Forgery Discovery

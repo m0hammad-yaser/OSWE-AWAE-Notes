@@ -58,9 +58,7 @@ Then we used in a second Gobuster scan proxied through Burp Suite for deeper ana
 
 **Key findings:**
 - `/render` endpoints returned `401 Unauthorized` with a `WWW-Authenticate: Key realm="kong"` header, indicating API key protection.
-- `/users` and `/files` returned `403 Forbidden` responses with headers indicating a **`Directus`** backend and messages referencing `directus_users` and `directus_files` collections.
-
-Directus is "an instant app and API for your SQL database."
+- `/users` and `/files` returned `403 Forbidden` responses with headers indicating a **`Directus`** (an instant app and API for your SQL database) backend and messages referencing `directus_users` and `directus_files` collections.
 
 This helped identify three key services worth further testing:
 - files

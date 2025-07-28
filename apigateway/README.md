@@ -23,3 +23,34 @@ Though these are standard conventions, implementations can vary. Some services m
 
 Because tools often default to `GET` requests, they may miss endpoints requiring other methods. Understanding method behavior is key when exploring or testing APIs.
 ### Initial Enumeration
+We began API discovery by sending a request to the API gateway:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -i http://apigateway:8000                                  
+HTTP/1.1 404 Not Found
+Date: Mon, 28 Jul 2025 17:18:18 GMT
+Content-Type: application/json; charset=utf-8
+Connection: keep-alive
+Content-Length: 48
+X-Kong-Response-Latency: 1
+Server: kong/2.2.1
+
+{"message":"no Route matched with those values"}                                                                                                                          
+┌──(kali㉿kali)-[~]
+└─$
+```
+Which returned a `404 Not Found` and revealed it’s powered by `Kong Gateway 2.2.1`. Attempts to access the Kong Admin API on port `8001` failed:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -i http://apigateway:8001 
+curl: (7) Failed to connect to apigateway port 8001 after 81 ms: Could not connect to server
+                                                                                                                          
+┌──(kali㉿kali)-[~]
+└─$
+```
+Using Gobuster, we brute-forced directories on port `8000` and captured endpoints returning `403 Forbidden` and `401 Unauthorized`, which often indicate valid paths that require authentication.
+
+An API might return an HTTP `405 Method Not Allowed` response to a `GET` request. 
+```bash
+gobuster dir -u http://apigateway:8000 -w /usr/share/wordlists/dirbuster/directory-list-1.0.txt -b "" -s "200,204,301,302,307,401,403,405,500"
+```

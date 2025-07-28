@@ -54,3 +54,17 @@ An API might return an HTTP `405 Method Not Allowed` response to a `GET` request
 ```bash
 gobuster dir -u http://apigateway:8000 -w /usr/share/wordlists/dirbuster/directory-list-1.0.txt -b "" -s "200,204,301,302,307,401,403,405,500"
 ```
+Then we used in a second Gobuster scan proxied through Burp Suite for deeper analysis.
+
+**Key findings:**
+- `/render` endpoints returned `401 Unauthorized` with a `WWW-Authenticate: Key realm="kong"` header, indicating API key protection.
+- `/users` and `/files` returned `403 Forbidden` responses with headers indicating a **`Directus`** backend and messages referencing `directus_users` and `directus_files` collections.
+- 
+Directus is "an instant app and API for your SQL database."
+
+This helped identify three key services worth further testing:
+- files
+- users
+- render
+lets save them in a new file called `endpoints_simple.txt`
+### Advanced Enumeration with Verb Tampering

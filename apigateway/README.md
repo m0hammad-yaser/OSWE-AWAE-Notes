@@ -11,3 +11,4 @@ An API gateway serves as a single entry point, handling tasks like authenticatio
 Web service URLs typically follow structured patterns for routing requests. Common elements include versioning (e.g., `/v1/`), service names (e.g., `/products/`), and parameters (e.g., `/users/octocat`).
 
 Some APIs use subdomains for routing, others use path-based patterns. Versioning may appear in the URL or be handled via request headers.
+## API Discovery via Verb Tampering

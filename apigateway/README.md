@@ -67,3 +67,31 @@ This helped identify three key services worth further testing:
 
 lets save them in a new file called `endpoints_simple.txt`
 ### Advanced Enumeration with Verb Tampering
+Now that we have three potential API services, let's do another round of enumeration. URLs for RESTful APIs often follow a pattern of `<object>`/`<action>` or `<object>`/`<identifier>`. We might be able to discover more services by taking the list of endpoints we have already identified and iterating through a wordlist to find valid actions or identifiers.
+
+We also need to keep in mind that web APIs might respond differently based on which HTTP request method we use. For example, a `GET` request to `/auth` might return an HTTP `404` response, while a `POST` request to the same URL returns an HTTP `200 OK` on a valid login or an HTTP `401 Unauthorized` on an invalid login attempt.
+
+**Custom Script:** [route_buster.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/route_buster.py) 
+
+A Python script was written to:
+- Take a list of base endpoints (`-w`) and action words (`-a`).
+- Send both `GET` and `POST` requests to all `/endpoint/action` combinations.
+- Print results for responses not in [`204`, `401`, `403`, `404`].
+
+Output:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 route_buster.py -a /usr/share/wordlists/dirb/small.txt -w endpoints_simple.txt -t http://apigateway:8000 
+Path                    -       GET     POST
+/files/import            -      403     400
+/users/frame             -      200     404
+/users/home              -      200     404
+/users/invite            -      403     400
+/users/readme            -      200     404
+/users/welcome           -      200     404
+/users/wellcome          -      200     404
+Wordlist complete. Goodbye.
+                                                                                                                          
+┌──(kali㉿kali)-[~]
+└─$
+```

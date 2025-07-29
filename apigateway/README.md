@@ -400,3 +400,4 @@ Trying host: 172.16.16.7
 Trying host: 172.16.16.8
         8000     {"errors":[{"message":"connect EHOSTUNREACH 172.16.16.8:8000","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
 ```
+This error message might mean the host couldn't find a route to a given IP address. Since we have several live hosts to work with, we can ignore any IP addresses that resulted in the "EHOSTUNREACH" error.

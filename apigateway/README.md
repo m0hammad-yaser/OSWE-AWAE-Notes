@@ -453,3 +453,12 @@ Via: kong/2.2.1
 {"errors":[{"message":"Request failed with status code 404","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
 ```
 Our request failed to locate a valid resource, likely because the backend URL differs from the one exposed by the API gateway—possibly due to versioning. We'll try fuzzing and analyzing response codes to identify the correct backend path.
+
+First, we'll need to build a short wordlist with potential URLs.
+```text
+/
+/render
+/v1/render
+/api/render
+/api/v1/render
+```

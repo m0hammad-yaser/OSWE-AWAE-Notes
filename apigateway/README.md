@@ -480,3 +480,13 @@ Output:
 └─$ 
 ```
 We received one interesting response: `"Request failed with status code 400"`. An HTTP `400 Bad Request` usually indicates that the server cannot process a request due to missing data or a client error.
+
+If the service generates content, we need to determine how to supply data to it. We'll start by testing a small set of relevant parameter names and values, including our Kali host in URLs to monitor for callbacks. We can expand the list later using wordlists if needed.
+
+```text
+?data=foobar
+?file=file:///etc/passwd
+?url=http://192.168.118.3/render/url
+?input=foobar
+?target=http://192.168.118.3/render/target
+```

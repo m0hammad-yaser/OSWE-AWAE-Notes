@@ -290,6 +290,7 @@ Rather than exhaustively scanning all 65,535 ports, we optimize SSRF-based port 
 A Python script was written: [ssrf_port_scanner.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/ssrf_port_scanner.py)
 
 `"You don't have permission"` → Port OPEN (valid resource)
+
 `"ECONNREFUSED"` → Port CLOSED
 
 Output:

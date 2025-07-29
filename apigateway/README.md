@@ -490,13 +490,14 @@ If the service generates content, we need to determine how to supply data to it.
 ?input=foobar
 ?target=http://192.168.45.203/render/target
 ```
-Even without valid parameters, triggering errors on the render service might reveal useful clues. In unfamiliar environments, subtle differences in server responses can help us understand the system. We'll run a new wordlist through our [ssrf_path_scanner.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/ssrf_path_scanner.py) script again, updating the SSRF target to the new URL. With an HTTP server opened on port `80`:
+Even without valid parameters, triggering errors on the render service might reveal useful clues. In unfamiliar environments, subtle differences in server responses can help us understand the system. We'll run a new wordlist through our [ssrf_path_scanner.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/ssrf_path_scanner.py) script again, updating the SSRF target to the new URL. With an Apache HTTP server opened on port `80` (don't use Python server because it doesn't desplay the useragent):
 
 ```bash
 ┌──(kali㉿kali)-[~]
-└─$ python3 -m http.server 80
-Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
-
+└─$ sudo systemctl start apache2
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$
 ```
 
 Output:
@@ -515,9 +516,9 @@ Output:
 It seems the url parameter was a valid request based on the permission error message. Let's check if it actually connected back to our Kali host.
 ```bash
 ┌──(kali㉿kali)-[~]
-└─$ python3 -m http.server 80
-Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
-192.168.217.135 - - [29/Jul/2025 11:42:09] code 404, message File not found
-192.168.217.135 - - [29/Jul/2025 11:42:09] "GET /render/url HTTP/1.1" 404 -
-
+└─$ sudo tail /var/log/apache2/access.log
+192.168.217.135 - - [29/Jul/2025:11:55:23 -0400] "GET /render/url HTTP/1.1" 404 493 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$
 ```

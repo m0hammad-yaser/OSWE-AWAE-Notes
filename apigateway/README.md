@@ -406,3 +406,28 @@ Based on the response values, we can assume the first six hosts are valid. Let's
 
 We can limit the amount of extraneous data by filtering `"connection refused"` messages.
 
+Scan for common port on these live hosts: [liveIP_port_scan.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/liveIP_port_scan.py)
+
+Output:
+```bash
+kali@kali:~$ python3 liveIP_port_scan.py -t http://apigateway:8000/files/import --timeout 5
+Trying host: 172.16.16.1
+        22       ???? - returned parse error, potentially open non-http
+        8000     OPEN - returned 404
+Trying host: 172.16.16.2
+        8000     OPEN - returned 404
+        8001     OPEN - returned permission error, therefore valid resource
+Trying host: 172.16.16.3
+        5432     OPEN - socket hang up, likely non-http
+Trying host: 172.16.16.4
+        8055     OPEN - returned permission error, therefore valid resource
+Trying host: 172.16.16.5
+        9000     OPEN - returned 404
+Trying host: 172.16.16.6
+        6379     ???? - returned parse error, potentially open non-http
+```
+These results are promising. We know the Kong API Gateway is running on `8000`. This port is open on the first two hosts. Kong runs its Admin API on port `8001`, restricted to localhost. Since `172.16.16.2` has ports `8000` and` 8001` open, we can assume that it is running the Kong API Gateway. The host on `172.16.16.1` is likely the network gateway or an external network interface.
+
+The default port for Directus is `8055`, which aligns with host four. Port `5432` is the default port for PostgreSQL. Port `6379` is the default port for REDIS. Using this information, we now have a better picture of the internal network.
+
+We still have one host running an unknown HTTP service on port `9000`. However, the SSRF vulnerability allows us to verify which backend servers are hosting the public endpoints we have identified.

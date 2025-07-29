@@ -3,7 +3,7 @@
 
 """
 IMPORTANT:
-place the rce_script.py on your web root 
+place the rce_script.py on your web root directory
 """
 
 """

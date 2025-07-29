@@ -124,3 +124,5 @@ Via: kong/2.2.1
 - Any time we discover an API or web form that includes a `url` parameter, we always want to check it for a Server-Side Request Forgery vulnerability.
 
 ## Server-Side Request Forgery Discovery
+Server-Side Request Forgery (SSRF) is a vulnerability where an attacker tricks a server into making unauthorized requests. Because the request originates from the server, it may access internal resources, such as services on localhost, internal IP ranges, or systems behind firewalls or reverse proxies.
+

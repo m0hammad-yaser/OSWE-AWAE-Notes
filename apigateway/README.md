@@ -625,4 +625,9 @@ kali@kali:~$ sudo tail /var/log/apache2/access.log
 ```
 Excellent. Our JavaScript function sent a request to the internal endpoint, then sent that response as a URL-encoded value back to our Kali host. The message might have been truncated, but our JavaScript function worked.
 ### Stealing Credentials from Kong Admin API
+Next, we'll turn our focus to stealing credentials from the Kong Admin API with our JavaScript payload. As a reminder, when we first called the /render endpoint through the Kong API Gateway, it responded with `"No API key found in request"`. Let's try to find that API key in Kong's Admin API.
 
+We can find the Admin API endpoint that returns API keys in Kong's documentation. Let's update our JavaScript function to call `/key-auths`, call the Render service, and then check `access.log`.
+```html
+
+```

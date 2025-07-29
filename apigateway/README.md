@@ -249,4 +249,4 @@ const fileResponse = await axios.get<NodeJS.ReadableStream>(req.body.url, {
 **Axios fetches the user-supplied URL** before any access checks, allowing attackers to trigger internal requests.
 
 Because URL fetching (`axios.get`) happens **prior to any authentication or authorization**, this endpoint is vulnerable to **unauthenticated blind SSRF**.
-
+### Exploiting Blind SSRF in Directus

@@ -282,3 +282,4 @@ Server response:
 This confirms that SSRF request reached Directus on port `8055` as it returned HTTP `403 Forbidden`, but confirms a valid internal resource was accessed.
 
 We can easily verify that TCP port `8055` is **closed externally on the Kong API Gateway server**. We are likely dealing with two or more servers in this scenario.
+#### Port Scanning via Blind SSRF

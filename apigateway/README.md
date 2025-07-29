@@ -373,3 +373,6 @@ Trying host: http://172.16.16.1
 Trying host: http://172.16.17.1
         8000     timed out
 ```
+We found a live IP address at `172.16.16.1`. It may seem odd that a gateway has an open port but this may be an idiosyncrasy of the underlying environment. The important takeaway here is that it responded differently than the other IPs. Even a `"connection refused"` message would indicate we had found something interesting.
+
+#### Host Enumeration

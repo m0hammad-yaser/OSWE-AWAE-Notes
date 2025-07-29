@@ -348,3 +348,6 @@ kali@kali:~$ curl -X POST -H "Content-Type: application/json" -d '{"url":"http:/
 Total: 60155041 microseconds
 ```
 A request to an invalid host took **60.155041 seconds**. We can assume that the timeout is configured to one minute. Using this information, we can deduce if an IP is valid or not, in a technique similar to an Nmap host scan. If we search for a gateway (assuming the gateway ends with `".1"`), we can discover the subnet the containers are running on.
+
+Balancing request timeouts is crucial during SSRF scanning. Waiting for every server response without a timeout makes scans very slow, while setting the timeout too low can overwhelm the server and result in false negatives. An optimal timeout value is needed to ensure scans are both efficient and accurate.
+

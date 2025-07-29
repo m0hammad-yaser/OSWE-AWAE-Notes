@@ -199,3 +199,54 @@ Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
 
 ```
 This confirms a **blind SSRF vulnerability**—the backend can make unauthenticated outbound requests, but the response data isn't returned to the attacker.
+### Souorce Code Analysis
+The SSRF vulnerability in Directus stems from how the `/files/import` endpoint handles requests before performing authentication or authorization.
+
+#### In `/api/src/middleware/authenticate.ts`:
+```ts
+12  const authenticate: RequestHandler = asyncHandler(async (req, res, next) => {
+13    req.accountability = {
+14      user: null,
+15      role: null,
+16      admin: false,
+17      ip: req.ip.startsWith('::ffff:') ? req.ip.substring(7) : req.ip,
+18      userAgent: req.get('user-agent'),
+19    };
+20  
+21    if (!req.token) return next();
+22  
+23    if (isJWT(req.token)) {
+```
+If no token is provided, the middleware **does not block the request**, and simply moves to the next handler.
+
+The `req.accountability` object is initialized with `user: null` and `role: null`, allowing unauthenticated access to continue.
+
+#### In `/api/src/controllers/files.ts`, the vulnerable endpoint begins at line `138`:
+```ts
+138  router.post(
+139    '/import',
+140    asyncHandler(async (req, res, next) => {
+141      const { error } = importSchema.validate(req.body);
+142  
+143      if (error) {
+144        throw new InvalidPayloadException(error.message);
+145      }
+146  
+147      const service = new FilesService({
+148        accountability: req.accountability,
+149        schema: req.schema,
+150      });
+```
+The function validates input, creates a service with `req.accountability`, then proceeds without checking auth.
+
+The core SSRF happens here:
+```ts
+const fileResponse = await axios.get<NodeJS.ReadableStream>(req.body.url, {
+  responseType: 'stream',
+});
+
+```
+**Axios fetches the user-supplied URL** before any access checks, allowing attackers to trigger internal requests.
+
+Because URL fetching (`axios.get`) happens **prior to any authentication or authorization**, this endpoint is vulnerable to **unauthenticated blind SSRF**.
+

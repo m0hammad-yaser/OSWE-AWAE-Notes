@@ -376,3 +376,7 @@ Trying host: http://172.16.17.1
 We found a live IP address at `172.16.16.1`. It may seem odd that a gateway has an open port but this may be an idiosyncrasy of the underlying environment. The important takeaway here is that it responded differently than the other IPs. Even a `"connection refused"` message would indicate we had found something interesting.
 
 #### Host Enumeration
+Now that we've identified a live IP address, let's copy our script to a new file named ssrf_subnet_scanner.py and modify it to scan just the subnet we previously identified for live IPs. It does not matter which port number we use in this scan. We can identify live hosts even if they refuse connections on the chosen port.
+
+Script: [host_enum.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/host_enum.py) 
+

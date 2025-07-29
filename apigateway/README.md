@@ -524,3 +524,4 @@ It seems the url parameter was a valid request based on the permission error mes
 ```
 Not only did we receive a request from the render service, `HeadlessChrome/79.0.3945.0` made the request.
 ### Exploiting Headless Chrome
+Previously, SSRF in the Directus Files API used the `axios` user agent. Now, by targeting the Render API, we can make a Headless Chrome instance access URLs. Unlike basic SSRF, Headless Chrome behaves like a full browser, executing JavaScript. This allows us to run arbitrary scripts on the remote server, enabling interaction with internal services, data extraction, and more complex actions.

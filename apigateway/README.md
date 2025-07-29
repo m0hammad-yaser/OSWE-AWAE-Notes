@@ -522,3 +522,4 @@ It seems the url parameter was a valid request based on the permission error mes
 ┌──(kali㉿kali)-[~]
 └─$
 ```
+Not only did we receive a request from the render service, `HeadlessChrome/79.0.3945.0` made the request.

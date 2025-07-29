@@ -351,3 +351,25 @@ A request to an invalid host took **60.155041 seconds**. We can assume that the 
 
 Balancing request timeouts is crucial during SSRF scanning. Waiting for every server response without a timeout makes scans very slow, while setting the timeout too low can overwhelm the server and result in false negatives. An optimal timeout value is needed to ensure scans are both efficient and accurate.
 
+We'll write a new script to scan subnets for default gateways and constrain our port scanning to a single port to reduce scan time. The port we decide to scan does not matter since we are only attempting to determine if the host is up.
+ChatGPT said:
+
+To scan for default gateways, `".1"` is used as the fourth octet in each IP address. Because the `10.0.0.0/8` and `172.16.0.0/12` networks have fixed first octets, nested loops are used to iterate through the second and third octets. Since scanning the `192.168.0.0/16` range produced no results, the focus shifts to the `172.16.0.0/12` range.
+
+Script: [ssrf_gateway_scanner.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/ssrf_gateway_scanner.py)
+
+Output:
+```bash
+kali@kali:~$ python3 ssrf_gateway_scanner.py -t http://apigateway:8000/files/import
+Trying host: http://172.16.1.1
+        8000     timed out
+Trying host: http://172.16.2.1
+        8000     timed out
+...
+Trying host: http://172.16.15.1
+        8000     timed out
+Trying host: http://172.16.16.1
+        8000     OPEN - returned 404
+Trying host: http://172.16.17.1
+        8000     timed out
+```

@@ -523,3 +523,4 @@ It seems the url parameter was a valid request based on the permission error mes
 └─$
 ```
 Not only did we receive a request from the render service, `HeadlessChrome/79.0.3945.0` made the request.
+### Exploiting Headless Chrome

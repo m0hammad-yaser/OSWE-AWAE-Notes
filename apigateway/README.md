@@ -333,3 +333,5 @@ On the other hand, there are three established ranges for private IP addresses.
 | 172.16.0.0/12    | 1,048,576          |
 | 192.168.0.0/16   | 65,536             |
 
+Scanning an entire `/8` or even a `/12` network via SSRF could take several days. Rather than scanning an entire subnet, we can try scanning for network gateways. Network designs commonly use a `/16` or `/24` subnet mask with the gateway running on the IP where the forth octet is `".1"` (for example: `192.168.1.1/24` or `172.16.0.1/16`). However, gateways can live on any IP address and subnets can be any size. 
+

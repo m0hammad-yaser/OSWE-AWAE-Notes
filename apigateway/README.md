@@ -787,7 +787,7 @@ It seems like our payload worked. We will need to set up a Netcat listener and t
 
 ```
 The request will hang, but if we check our Netcat listener, we should have a shell.
-```bash
+```shell
 ┌──(kali㉿kali)-[~]
 └─$ nc -nlvp 1337  
 listening on [any] 1337 ...

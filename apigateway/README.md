@@ -250,3 +250,6 @@ const fileResponse = await axios.get<NodeJS.ReadableStream>(req.body.url, {
 
 Because URL fetching (`axios.get`) happens **prior to any authentication or authorization**, this endpoint is vulnerable to **unauthenticated blind SSRF**.
 ### Exploiting Blind SSRF in Directus
+Since we cannot access the results of the SSRF, how can we use it to further our attack? As we have already demonstrated, the application returns different messages for valid files and non-existing files. We can use these different messages to infer if a resource exists.
+
+As a reminder, we receive an HTTP `403 Forbidden` when we request a valid resource and an HTTP `500 Internal Server Error` with "Request failed with status code 404" when we request a resource that doesn't exist.

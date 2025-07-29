@@ -576,3 +576,5 @@ Since we received a "forbidden" response, the browser should have loaded our HTM
 
 
 ```
+
+We have verified we can execute JavaScript in the Headless Chrome browser.

@@ -321,3 +321,15 @@ Output:
 The scan results are not inspiring. We only scanned a handful of ports, but only port 8055 is open, which the web service is running on. The common services for connecting to a server, such as SSH and RDP, are either not present or not running on their normal ports. There are no common database ports open either. We are likely communicating with a microservice running in a container.
 
 #### Subnet Scanning with SSRF
+According to its description, Directus is a platform for "managing the content of any SQL database". It is reasonable to expect that Directus will connect to a database server. Let's try using the SSRF vulnerability to scan for other targets on the internal network.
+
+However, we don't know the IP address range the network uses. We can attempt to scan private IP ranges.
+If we attempt to brute force host names, we need to account for any extra latency introduced by DNS lookups on the victim machine.
+
+On the other hand, there are three established ranges for private IP addresses.
+| IP address range | Number of addresses |
+|------------------|---------------------|
+| 10.0.0.0/8       | 16,777,216         |
+| 172.16.0.0/12    | 1,048,576          |
+| 192.168.0.0/16   | 65,536             |
+

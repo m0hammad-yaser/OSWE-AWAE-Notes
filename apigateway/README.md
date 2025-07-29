@@ -401,3 +401,8 @@ Trying host: 172.16.16.8
         8000     {"errors":[{"message":"connect EHOSTUNREACH 172.16.16.8:8000","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
 ```
 This error message might mean the host couldn't find a route to a given IP address. Since we have several live hosts to work with, we can ignore any IP addresses that resulted in the "EHOSTUNREACH" error.
+
+Based on the response values, we can assume the first six hosts are valid. Let's modify the script to scan for common ports on those hosts, using the same list of ports.
+
+We can limit the amount of extraneous data by filtering `"connection refused"` messages.
+

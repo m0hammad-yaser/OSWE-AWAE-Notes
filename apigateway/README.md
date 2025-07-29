@@ -691,3 +691,10 @@ Now that we have the API key, we should be able to call the render endpoint thro
 ## Remote Code Execution
 Since we can execute arbitrary JavaScript via the Render service, we can send requests to any of the hosts in the internal network. The PostgreSQL database will be difficult to attack without credentials. The REDIS server seems enticing, but let's focus on the Kong API Gateway since we already know we can access it via the Render service headless browser.
 ### RCE in Kong Admin API
+After reviewing [documentation for Kong API Gateway](https://developer.konghq.com/plugins/pre-function/), the plugins seemed like a good area to focus on. We can't install a custom plugin without the ability to restart Kong so we need to use the plugins already included.
+
+The **`Serverless Functions`** plugin has an interesting warning in its documentation:
+    ```
+    Warning: The pre-function and post-function serverless plugin allows anyone who can enable the plugin to execute arbitrary code. If your organization has security concerns about this, disable the plugin in your `kong.conf` file.
+    ```
+That sounds perfect for our purposes!

@@ -694,7 +694,9 @@ Since we can execute arbitrary JavaScript via the Render service, we can send re
 After reviewing [documentation for Kong API Gateway](https://developer.konghq.com/plugins/pre-function/), the plugins seemed like a good area to focus on. We can't install a custom plugin without the ability to restart Kong so we need to use the plugins already included.
 
 The **`Serverless Functions`** plugin has an interesting warning in its documentation:
-    ```
+
+```text
     Warning: The pre-function and post-function serverless plugin allows anyone who can enable the plugin to execute arbitrary code. If your organization has security concerns about this, disable the plugin in your `kong.conf` file.
-    ```
+```
+    
 That sounds perfect for our purposes!

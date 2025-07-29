@@ -479,3 +479,4 @@ Output:
 ┌──(kali㉿kali)-[~]
 └─$ 
 ```
+We received one interesting response: `"Request failed with status code 400"`. An HTTP `400 Bad Request` usually indicates that the server cannot process a request due to missing data or a client error.

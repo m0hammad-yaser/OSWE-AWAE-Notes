@@ -688,3 +688,4 @@ After decoding the data, we find the API key.
   "consumer":{"id":"a8c78b54-1d08-43f8-acd2-fb2c7be9e893"}}]}
 ```
 Now that we have the API key, we should be able to call the render endpoint through the API gateway without needing the SSRF vulnerability.
+## Remote Code Execution

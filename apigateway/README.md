@@ -380,3 +380,23 @@ Now that we've identified a live IP address, let's copy our script to a new file
 
 Script: [host_enum.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/host_enum.py) 
 
+Output:
+```bash
+kali@kali:~$ python3 host_enum.py -t http://apigateway:8000/files/import --timeout 5
+Trying host: 172.16.16.1
+        8000     OPEN - returned 404
+Trying host: 172.16.16.2
+        8000     OPEN - returned 404
+Trying host: 172.16.16.3
+        8000     Connection refused, could be live host
+Trying host: 172.16.16.4
+        8000     Connection refused, could be live host
+Trying host: 172.16.16.5
+        8000     Connection refused, could be live host
+Trying host: 172.16.16.6
+        8000     Connection refused, could be live host
+Trying host: 172.16.16.7
+        8000     {"errors":[{"message":"connect EHOSTUNREACH 172.16.16.7:8000","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+Trying host: 172.16.16.8
+        8000     {"errors":[{"message":"connect EHOSTUNREACH 172.16.16.8:8000","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+```

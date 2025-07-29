@@ -816,3 +816,6 @@ var
 
 ```
 Our payload worked and we now have a reverse shell on the Kong API Gateway server. The presence of `.dockerenv` and `docker-entrypoint.sh` confirm our earlier suspicion that the servers were actually containers.
+
+Automation Script: [rce_script.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/apigateway/rce_script.py)
+

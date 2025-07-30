@@ -209,7 +209,7 @@ To explore bypassing the blocklist and executing arbitrary PHP code, we focus on
 This function returns an array of all available functions—both built-in and user-defined. Built-in functions are accessible via `$arr["internal"]`.
 
 By accessing this array, it's possible to invoke a function indirectly using its index or a variable reference, potentially evading blocklist detection. To test this idea:
-```
+```bash
 student@dolibarr:~$ php -a
 Interactive shell
 

@@ -132,7 +132,7 @@ The function uses regular expressions to filter the `$s` input:
 
 Next, we’ll review the checks implemented between lines `8995` and `9021` for additional validation or controls.
 
-```
+```php
 8995  if (is_array($s) || $s === 'Array') {
 8996      return 'Bad string syntax to evaluate (value is Array) '.var_export($s, true);
 8997  }

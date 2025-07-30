@@ -274,3 +274,17 @@ student
 ```
 Excellent. We can invoke `exec()` without specifying the function name directly. We can build a payload using this approach to bypass the restrictions in the `dol_eval()` function.
 
+A challenge with using `get_defined_functions()` is that the index of a desired function (like `base64_decode()`) may vary, since Dolibarr might load additional functions at runtime.
+
+To work around this, we could use `array_search()` to locate the function in the array. 
+
+```bash
+php > echo array_search("exec", get_defined_functions()["internal"]);
+550
+php >
+```
+
+However, we can't use the function name (`exec`) since the `dol_eval()` function blocks those keywords. 
+
+Since direct use of blocked function names (like `base64_decode()`) isn't allowed by `dol_eval()`, we need alternatives. Fortunately, PHP provides native support for other encoding schemes—such as URL-encoding—that aren't blocked, offering potential paths for bypass.
+

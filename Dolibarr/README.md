@@ -164,6 +164,43 @@ Next, we’ll review the checks implemented between lines `8995` and `9021` for 
 Code excerpt from `functions.lib.php`
 
 This code adds extra security checks by blocking certain special characters in the input string $s:
-- Line `8998` blocks `::` (scope resolution operator in PHP).
-- Line `9006` blocks backticks ``` (used for command execution, like `shell_exec()`).
+- Line `8998` blocks `::` (scope resolution operator in PHP, can be used to access properties or methods of a class).
+- Line `9006` blocks backticks `` ` `` (used for command execution, like `shell_exec()`).
 - Line `9014` blocks periods (`.`) unless they appear between two numbers (to prevent string concatenation, which can help bypass filters).
+
+Let's move on to the final series of checks, which we can find on lines `9023` through `9038`.
+```php
+9023  // We block use of php exec or php file functions
+9024  $forbiddenphpstrings = array('$$');
+9025  $forbiddenphpstrings = array_merge($forbiddenphpstrings, array('_ENV', '_SESSION', '_COOKIE', '_GET', '_POST', '_REQUEST'));
+9026  
+9027  $forbiddenphpfunctions = array("exec", "passthru", "shell_exec", "system", "proc_open", "popen", "eval", "dol_eval", "executeCLI", "verifCond", "base64_decode");
+9028  $forbiddenphpfunctions = array_merge($forbiddenphpfunctions, array("fopen", "file_put_contents", "fputs", "fputscsv", "fwrite", "fpassthru", "require", "include", "mkdir", "rmdir", "symlink", "touch", "unlink", "umask"));
+9029  $forbiddenphpfunctions = array_merge($forbiddenphpfunctions, array("function", "call_user_func"));
+9030  
+9031  $forbiddenphpregex = 'global\s+\$|\b('.implode('|', $forbiddenphpfunctions).')\b';
+9032  
+9033  do {
+9034      $oldstringtoclean = $s;
+9035      $s = str_ireplace($forbiddenphpstrings, '__forbiddenstring__', $s);
+9036      $s = preg_replace('/'.$forbiddenphpregex.'/i', '__forbiddenstring__', $s);
+9037      //$s = preg_replace('/\$[a-zA-Z0-9_\->\$]+\(/i', '', $s);	// Remove $function( call and $mycall->mymethod(
+9038  } while ($oldstringtoclean != $s);
+```
+Code excerpt from `functions.lib.php`
+
+The final checks in `dol_eval()` aim to **block potentially dangerous code execution patterns**:
+- Lines `9024`–`9025` define `$forbiddenphpstrings` with elements like `$_GET` and `$_POST` to block access to request data.
+- Lines `9027`–`9029` define `$forbiddenphpfunctions`, including functions for command execution (e.g., `exec`, `shell_exec`), file operations, and even `base64_decode`.
+- Line `9031` creates a regex from the forbidden function names.
+- Lines `9033`–`9038` run a loop that replaces any matches in `$s` with `"__forbiddenstring__"`.
+- After this, if `"__forbiddenstring__"` is found in `$s`, the function blocks execution and returns an error or blank value.
+
+#### Recap of `dol_eval()` protections:
+- Uses `$onlysimplestring` to control allowed characters.
+- Blocks `::`, backticks (`` ` ``), and most uses of `.`.
+- Applies a blocklist of dangerous strings and functions.
+- Specifically blocks `base64_decode`, but not other encoding/decoding techniques.
+
+Despite these layers of defense, vulnerabilities may remain. The next step is to attempt bypassing these protections to achieve code execution.
+### Filter Bypass the Hard Way

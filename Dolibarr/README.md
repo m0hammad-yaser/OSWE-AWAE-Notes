@@ -204,3 +204,37 @@ The final checks in `dol_eval()` aim to **block potentially dangerous code execu
 
 Despite these layers of defense, vulnerabilities may remain. The next step is to attempt bypassing these protections to achieve code execution.
 ### Filter Bypass the Hard Way
+To explore bypassing the blocklist and executing arbitrary PHP code, we focus on calling functions **without directly naming them**. Instead of searching for more dangerous functions, we examine PHP's `get_defined_functions()`.
+
+This function returns an array of all available functions—both built-in and user-defined. Built-in functions are accessible via `$arr["internal"]`.
+
+By accessing this array, it's possible to invoke a function indirectly using its index or a variable reference, potentially evading blocklist detection. To test this idea:
+```
+student@dolibarr:~$ php -a
+Interactive shell
+
+php > print_r(get_defined_functions());
+Array
+(
+    [internal] => Array
+        (
+            [0] => zend_version
+            [1] => func_num_args
+            [2] => func_get_arg
+            [3] => func_get_args
+            [4] => strlen
+            [5] => strcmp
+            [6] => strncmp
+...
+            [1582] => dl
+            [1583] => cli_set_process_title
+            [1584] => cli_get_process_title
+        )
+
+    [user] => Array
+        (
+        )
+
+)
+```
+

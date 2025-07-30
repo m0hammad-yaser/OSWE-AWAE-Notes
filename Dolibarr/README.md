@@ -311,3 +311,14 @@ We've verified that we can invoke an arbitrary function without specifying the f
 **REMINDER**: The value of the `$onlysimplestring` parameter controls which characters are allowed. We'll need to perform more analysis to find any calls to `dol_eval()` with the `$onlysimplestring` parameter set to anything other than `1` or `2`. We'll continue this analysis in the next Learning Unit.
 
 ## Bypass Security Filter to Trigger Eval
+This Learning Unit covers the following Learning Objectives:
+- Identify a vulnerable function call
+- Exploit Dolibarr for remote code execution
+
+In this Learning Unit, we will continue our source code analysis. We'll need to find calls `to dol_eval()` with the `$onlysimplestring` parameter set to anything other than `1` or `2` for our payload to work.
+
+### Finding the Target
+We'll return to VSCode and *Search* code for all instances of `dol_eval()` with any `$onlysimplestring` other than `1` or `2`. We'll need to use a regular expression to account for the different values passed to `dol_eval()` in each parameter.
+```regx
+dol_eval\(\$[\w\[\]']+,\s\d,\s\d,\s'(?!1|2)'\)
+```

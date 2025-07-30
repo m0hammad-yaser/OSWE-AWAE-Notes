@@ -46,7 +46,7 @@ To search for potential security risks, we look for uses of `eval()` by typing `
 
 We've reduced the number of results to `31` instances in `14` files. This is a more manageable number of files to review. Let's check the second result at `htdocs/core/lib/functions.lib.php`.
 
-The first two results are from comments documenting the `dol_eval()` function, which starts on line `8943`.
+**The first two results** are from comments documenting the `dol_eval()` function, which starts on line `8943`.
 
 ```php
 8943  /**
@@ -64,7 +64,7 @@ The first two results are from comments documenting the `dol_eval()` function, w
 
 The documentation indicates that `dol_eval()` is intended as a secure alternative to `eval()`, using the `$onlysimplestring` variable to control allowed characters. To assess its safety, we need to examine how this check is implemented and whether other protections are in place.
 
-Notably, the third search result appears within the `dol_eval()` function itself, which includes four calls to `eval()` between lines `9053` and `9061`. These lines should be closely reviewed to evaluate the function’s overall security.
+Notably, **the third search result** appears within the `dol_eval()` function itself, which includes four calls to `eval()` between lines `9053` and `9061`. These lines should be closely reviewed to evaluate the function’s overall security.
 
 ```php
 9051  if ($returnvalue) {

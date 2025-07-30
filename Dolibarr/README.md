@@ -319,6 +319,10 @@ In this Learning Unit, we will continue our source code analysis. We'll need to 
 
 ### Finding the Target
 We'll return to VSCode and *Search* code for all instances of `dol_eval()` with any `$onlysimplestring` other than `1` or `2`. We'll need to use a regular expression to account for the different values passed to `dol_eval()` in each parameter.
-```regx
+```
 dol_eval\(\$[\w\[\]']+,\s\d,\s\d,\s'(?!1|2)'\)
 ```
+We want to search for the literal term `"dol_eval("` followed by any variable or word, a comma, any two digits separated by a comma, and finally, any value other than `1` or `2`.
+
+We'll enter this value in the *Search* field and click the `Use Regular Expression` button (a period with an asterisk).
+

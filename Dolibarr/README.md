@@ -120,3 +120,15 @@ According to the `dol_eval()` function documentation, the `$onlysimplestring` va
 8994  }
 ```
 Code excerpt from `functions.lib.php`
+
+The `dol_eval()` function includes input validation based on the `$onlysimplestring` variable, but this control is limited. Specifically:
+- It only applies restrictions if `$onlysimplestring` is set to `1` or `2` (checked on lines `8969` and `8984`).
+- If `$onlysimplestring` has any other value, no input validation is enforced, potentially allowing unsafe characters.
+- Although the function defaults `$onlysimplestring` to `1`, there is no fallback or guard clause to handle unexpected values.
+
+The function uses regular expressions to filter the `$s` input:
+- When `$onlysimplestring == 1`: a stricter regex applies.
+- When `$onlysimplestring == 2`: the regex is slightly relaxed, allowing square brackets ([ and ]).
+
+Next, we’ll review the checks implemented between lines `8995` and `9021` for additional validation or controls.
+

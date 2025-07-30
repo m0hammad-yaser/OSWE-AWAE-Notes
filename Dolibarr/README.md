@@ -81,3 +81,7 @@ Notably, **the third search result** appears within the `dol_eval()` function it
 9062      }
 9063  }
 ```
+Each call to `eval()` includes the `$s` variable. Based on the function documentation, this variable contains the string to evaluate.
+
+Now that we know the `dol_eval()` function calls `eval()`, let's review how many places in the application call this function. We'll search for `dol_eval(` in code-server *Search*.
+

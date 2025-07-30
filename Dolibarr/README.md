@@ -405,3 +405,15 @@ Since we created a new attribute for the User object, let's check the list of us
 
 The list of users on the Users page includes a test column with a value of `11` in it. This is a strong indication that the application passed the value we entered in the Computed field to the `dol_eval()` function.
 
+#### Command Execution
+Let's try submitting our payload. First, we'll need to return to the Users module setup page at `http://dolibarr/dolibarr/user/admin/user_extrafields.php`. We can update the existing attribute by clicking the modify button (pencil icon ✏️) and then typing our payload in the Computed field.
+
+Below is the payload we crafted earlier in this Learning Module:
+```php
+get_defined_functions()["internal"][array_search(urldecode("%65%78%65%63"), get_defined_functions()["internal"])]("whoami");
+```
+After adding our new payload, we'll click `Save`. Now we can navigate back to the list of users and check the value of the `"test"` column.
+
+The appearance of **`"www-data"`** in the `"test"` column confirms that our payload was successfully processed by `dol_eval()`, bypassing its security filters. This verifies that the application's **custom attribute functionality is vulnerable** and can be exploited to achieve **remote code execution**.
+
+### Getting a Reverse Shell

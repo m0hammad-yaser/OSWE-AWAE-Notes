@@ -132,3 +132,34 @@ The function uses regular expressions to filter the `$s` input:
 
 Next, we’ll review the checks implemented between lines `8995` and `9021` for additional validation or controls.
 
+```
+8995  if (is_array($s) || $s === 'Array') {
+8996      return 'Bad string syntax to evaluate (value is Array) '.var_export($s, true);
+8997  }
+8998  if (strpos($s, '::') !== false) {
+8999      if ($returnvalue) {
+9000          return 'Bad string syntax to evaluate (double : char is forbidden): '.$s;
+9001      } else {
+9002          dol_syslog('Bad string syntax to evaluate (double : char is forbidden): '.$s);
+9003          return '';
+9004      }
+9005  }
+9006  if (strpos($s, '`') !== false) {
+9007      if ($returnvalue) {
+9008          return 'Bad string syntax to evaluate (backtick char is forbidden): '.$s;
+9009      } else {
+9010          dol_syslog('Bad string syntax to evaluate (backtick char is forbidden): '.$s);
+9011          return '';
+9012      }
+9013  }
+9014  if (preg_match('/[^0-9]+\.[^0-9]+/', $s)) {	// We refuse . if not between 2 numbers
+9015      if ($returnvalue) {
+9016          return 'Bad string syntax to evaluate (dot char is forbidden): '.$s;
+9017      } else {
+9018          dol_syslog('Bad string syntax to evaluate (dot char is forbidden): '.$s);
+9019          return '';
+9020      }
+9021  }
+```
+Code excerpt from `functions.lib.php`
+

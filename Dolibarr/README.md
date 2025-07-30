@@ -85,3 +85,6 @@ Each call to `eval()` includes the `$s` variable. Based on the function document
 
 Now that we know the `dol_eval()` function calls `eval()`, let's review how many places in the application call this function. We'll search for `dol_eval(` in code-server *Search*.
 
+Our search discovered `131` results in `56` files. It's reasonable for us to conclude that this application uses this function. We'll need to further analyze this function to determine if it presents a security risk.
+
+### Understanding the Filter Conditions

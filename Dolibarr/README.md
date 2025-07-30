@@ -381,3 +381,27 @@ Let's scroll to the top of this file to understand more about this function and 
 45  {
 ```
 
+The `CommonObject` class is a parent class for various business-related classes. Its public method `showOutputField()`—which contains the vulnerability—is inherited by all child classes, unless explicitly overridden. To identify these subclasses, we can *Search* for `extends CommonObject` in code-server.
+
+After a few moments, we receive `154` results in `130` files. Each class in the search results potentially increases the attack surface of this vulnerability.
+
+We could continue tracing this vulnerability through the source code, but Dolibarr is highly configurable and contains a multitude of business objects. Our Dolibarr VM has the application running in its default state.
+
+Let's log in to the application at `http://dolibarr/dolibarr/index.php`. After logging in, we'll check which modules are enabled by clicking on *Modules/Applications* or browsing to `http://dolibarr/dolibarr/admin/modules.php?mainmenu=home`.
+
+The *Users & Groups* module is the only one enabled by default. Let's click on the gear icon to determine what configuration options are available to us.
+
+Clicking through the available sub-options, we'll find that the `"Complementary attributes (Users)"` page allows us to define custom attributes which includes `"Computed field"`.
+
+This functionality seems to match with the vulnerable functions we identified earlier. Let's click the plus (`+`) button to add a new attribute and then check the tooltip for the *Computed field*.
+
+The pop-up window states we can enter `"any PHP coding to get a dynamic computed value"`. This confirms our suspicions that this functionality likely calls `dol_eval()`.
+
+Let's start with a simple payload to verify the application passes this string to `eval()`. We'll type `"test"` as the *Label or translation key* and select `"String (1 line)"` for the *Type*. The application will set some default values, which we'll leave as is. Next, we'll type `4+7;` in the *Computed field*.
+
+Once we've entered those values, we'll click `Save`. The application returns us to the Users modules setup page, but there's no indication of whether it called the vulnerable function.
+
+Since we created a new attribute for the User object, let's check the list of users. We can find it by clicking *Users & Groups*, then clicking *List of users* after the page reloads.
+
+The list of users on the Users page includes a test column with a value of `11` in it. This is a strong indication that the application passed the value we entered in the Computed field to the `dol_eval()` function.
+

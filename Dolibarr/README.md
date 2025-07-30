@@ -440,3 +440,5 @@ www-data@dolibarr:/usr/share/dolibarr/htdocs/user/admin$
 Excellent. Our payload worked and we now have a reverse shell on the Dolibarr VM.
 
 **Exploitation Script:** [rce_script.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/Dolibarr/rce_script.py)
+
+## Filter Bypass Revisted (Other Ways)

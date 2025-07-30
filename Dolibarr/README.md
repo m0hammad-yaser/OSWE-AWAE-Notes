@@ -326,3 +326,58 @@ We want to search for the literal term `"dol_eval("` followed by any variable or
 
 We'll enter this value in the *Search* field and click the `Use Regular Expression` button (a period with an asterisk).
 
+Three results, all from `commonobject.class.php`. Analyzing the search results, we can determine the `insertExtraFields()`, `updateExtraFields()`, and `showOutputField()` functions each contain a call to `dol_eval()` with an empty string for the `$onlysimplestring` parameter.
+
+The documentation for the `showOutputField()` function states `"Return HTML string to show a field into a page"`. This could be very useful for us. If this function returns a value which the web application then displays, we could use it to verify remote code execution with `"whoami"`.
+
+Let's review a few key lines from this function:
+```php
+7432  /**
+7433   * Return HTML string to show a field into a page
+7434   * Code very similar with showOutputField of extra fields
+7435   *
+7436   * @param  array   $val            Array of properties of field to show
+7437   * @param  string  $key            Key of attribute
+7438   * @param  string  $value          Preselected value to show (for date type it must be in timestamp format, for amount or price it must be a php numeric value)
+7439   * @param  string  $moreparam      To add more parametes on html input tag
+7440   * @param  string  $keysuffix      Prefix string to add into name and id of field (can be used to avoid duplicate names)
+7441   * @param  string  $keyprefix      Suffix string to add into name and id of field (can be used to avoid duplicate names)
+7442   * @param  mixed   $morecss        Value for css to define size. May also be a numeric.
+7443   * @return string
+7444   */
+7445  public function showOutputField($val, $key, $value, $moreparam = '', $keysuffix = '', $keyprefix = '', $morecss = '')
+7446  {
+...
+7476      $computed = empty($val['computed']) ? '' : $val['computed'];
+...
+7511      // If field is a computed field, value must become result of compute
+7512      if ($computed) {
+7513          // Make the eval of compute string
+7514          //var_dump($computed);
+7515          $value = dol_eval($computed, 1, 0, '');
+7516      }
+...
+7845      $out = $value;
+7846  
+7847      return $out;
+7848  }
+```
+The key focus is how the `dol_eval()` function is used:
+
+- The `$val` parameter is an array.
+- On **line `7476`**, the value of `$val["computed"]` is assigned to `$computed`.
+- If `$computed` is not false, it’s passed to `dol_eval()` on **line `7515`**, and the result is stored in `$value`.
+- Although a large `if...elseif` block modifies `$value` based on `$val["type"]`, it's not relevant to the current analysis.
+- Finally, on **lines `7845` and `7847`**, the function **returns the result** of the `dol_eval()` call.
+
+In short, user-controlled input from `$val["computed"]` can flow into `dol_eval()`, and its output is ultimately returned.
+
+Let's scroll to the top of this file to understand more about this function and its class.
+```php
+41  /**
+42   *  Parent class of all other business classes (invoices, contracts, proposals, orders, ...)
+43  */
+44  abstract class CommonObject
+45  {
+```
+

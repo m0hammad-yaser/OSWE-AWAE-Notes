@@ -163,3 +163,7 @@ Next, we’ll review the checks implemented between lines `8995` and `9021` for 
 ```
 Code excerpt from `functions.lib.php`
 
+This code adds extra security checks by blocking certain special characters in the input string $s:
+- Line `8998` blocks `::` (scope resolution operator in PHP).
+- Line `9006` blocks backticks ``` (used for command execution, like `shell_exec()`).
+- Line `9014` blocks periods (`.`) unless they appear between two numbers (to prevent string concatenation, which can help bypass filters).

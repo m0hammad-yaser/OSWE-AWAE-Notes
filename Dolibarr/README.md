@@ -31,3 +31,10 @@ These evaluate PHP code dynamically, which can lead to **arbitrary code executio
 | `call_user_func()`               | Calls a user-defined function (can be dangerous if function name is user-controlled) |
 | `call_user_func_array()`         | Calls a callback with parameters from an array (same risk as above)                  |
 
+## Vulnerability Discovery
+To effectively review source code for vulnerabilities, we can search for dangerous functions, known as sinks. Once identified, we trace these functions back to their input sources. If the source input is controllable and no security controls exist along the data flow, the dangerous function may be exploitable.
+
+In this Learning Unit, we will search the Dolibarr source code for dangerous functions and analyze any protective mechanisms that might impede exploitation.
+
+### Dolibarr Source Code Analysis
+The `eval()` function executed the contents of the string and displayed the results. While this example is benign, suppose we could modify the string an application passes to the `eval()` function. If the application lacked any input validation, we might be able to run arbitrary PHP code and take control of the server. This functions is difficult for developers to secure.

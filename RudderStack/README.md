@@ -368,5 +368,5 @@ uid=70(postgres) gid=70(postgres) groups=70(postgres),70(postgres)
 ```
 We now have a reverse shell.
 
-**Automation script:** 
+**Automation script:** [rce_script_noWAFbypass.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/RudderStack/rce_script_noWAFbypass.py)
 ## Bypassing a Web Application Firewall

@@ -100,4 +100,7 @@ kali@kali:~$ grep -e "/v" routes.txt | cut -d "(" -f 2 | cut -d "," -f 1 | cut -
 ```
 We’ll clean up the URLs by removing backticks (`` ` ``), format markers (`%s`), and `localhost` references to make them relative. For placeholders like `job_run_id`, we’ll replace them with `web300`.
 
-Final version: routes_clean.txt
+Final version: [routes_clean.txt](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/RudderStack/routes_clean.txt)
+
+Now that we have our list, we'll use Burp Suite to send requests to every endpoint. After opening Burp Suite, let's open the embedded browser and navigate to `http://rudderstack:8080/` so that we have a request that we can send to *Intruder*.
+

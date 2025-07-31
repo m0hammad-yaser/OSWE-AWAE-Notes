@@ -292,3 +292,21 @@ error getting pending staging file count : query:
  failed with Error : pq: unterminated quoted string at or near "''';
 "
 ```
+Since we have access to the source code, we can easily determine that the application uses PostgreSQL by reviewing the `setupDB()` function, which starts on line `2066` of `warehouse.go`.
+```go
+func setupDB(ctx context.Context, connInfo string) error {
+	if isStandAloneSlave() {
+		return nil
+	}
+
+	var err error
+	dbHandle, err = sql.Open("postgres", connInfo)
+	if err != nil {
+		return err
+	}
+...
+}
+```
+We could also consult the application's online documentation. In a black box assessment scenario, we could research the error message online to determine the database.
+
+Since our injection point is at the end of the SQL statement and we are dealing with a PostgreSQL database, we have the ability injecting a stacked query. 

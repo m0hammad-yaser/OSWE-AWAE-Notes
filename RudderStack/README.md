@@ -181,3 +181,83 @@ We receive **three** results in **two** files. The results in `warehouse.go` see
 1689	}
 ```
 We've found the two error messages we've received so far. Line `1682` defines the `sourceID` variable. Since our request does not contain the necessary value, the `if` statement on line `1685` evaluates as `true` and we receive the error message from line `1687`.
+
+We need to determine the proper value we need to include in our JSON body to control the value of `pendingEventsReq.SourceID`. The code declares the type of `pendingEventsReq` as `warehouseutils.PendingEventsRequestT` on line `1674`.
+
+If we search in our IDE for `"PendingEventsRequestT"`, we can find it declared as a `struct` in `warehouse/utils/utils.go` on lines `321` through `324`.
+
+```go
+321  type PendingEventsRequestT struct {
+322    SourceID  string `json:"source_id"`
+323    TaskRunID string `json:"task_run_id"`
+324  }
+```
+
+Based on this source code, we'll need to include `source_id` and `task_run_id` in the JSON body. Let's return to *Repeater* in Burp Suite and update our request body to include these keys. We'll set the value of each to `"1"` for now. After updating the request, let's click *Send*.
+```text
+POST /v1/warehouse/pending-events?triggerUpload=true HTTP/1.1
+Host: rudderstack:8080
+Content-Type: application/json
+Content-Length: 43
+
+{
+"source_id": "1",
+"task_run_id": "1"
+}
+```
+Reponse received:
+```
+HTTP/1.1 200 OK
+Content-Length: 70
+Content-Type: text/plain; charset=utf-8
+Date: Thu, 31 Jul 2025 19:33:25 GMT
+Vary: Origin
+
+{"pending_events":false,"pending_staging_files":0,"pending_uploads":0}
+```
+The application responded with HTTP `200 OK`, meaning we were able to call the API endpoint **without authentication**. Let's return to our IDE to determine what we can do with this endpoint. We'll continue analyzing the `pendingEventsHandler()` function in `warehouse.go`, starting on line `1691`.
+```go
+1691  pendingEvents := false
+1692  var pendingStagingFileCount int64
+1693  var pendingUploadCount int64
+1694  
+1695  // check whether there are any pending staging files or uploads for the given source id
+1696  // get pending staging files
+1697  pendingStagingFileCount, err = getPendingStagingFileCount(sourceID, true)
+1698  if err != nil {
+1699      err := fmt.Errorf("error getting pending staging file count : %v", err)
+1700      pkgLogger.Errorf("[WH]: %v", err)
+1701      http.Error(w, err.Error(), http.StatusInternalServerError)
+1702      return
+1703  }
+```
+Line `1697` passes the `sourceID` value to the `getPendingStagingFileCount()` function. We can find that function starting on line `1777` in the same file.
+```go
+1777  func getPendingStagingFileCount(sourceOrDestId string, isSourceId bool) (fileCount int64, err error) {
+1778      sourceOrDestColumn := ""
+1779      if isSourceId {
+1780          sourceOrDestColumn = "source_id"
+1781      } else {
+1782          sourceOrDestColumn = "destination_id"
+1783      }
+1784      var lastStagingFileIDRes sql.NullInt64
+1785      sqlStatement := fmt.Sprintf(`
+1786          SELECT 
+1787            MAX(end_staging_file_id) 
+1788          FROM 
+1789            %[1]s 
+1790          WHERE 
+1791            %[1]s.%[3]s = '%[2]s';
+1792  `,
+1793          warehouseutils.WarehouseUploadsTable,
+1794          sourceOrDestId,
+1795          sourceOrDestColumn,
+1796      )
+1797  
+1798      err = dbHandle.QueryRow(sqlStatement).Scan(&lastStagingFileIDRes)
+```
+This creates a SQL statement on lines `1785` through `1796`, using `Sprintf()`. The function writes the `sourceOrDestId` value into the SQL statement. While this string formatting approach may seem similar to a parameterized query, it is not, and **does not offer any of the protections against SQL injection**. The code creates the `sqlStatement`, inserting the user-supplied value in the `sourceOrDestId` in the `WHERE` clause. Line `1798` then executes the SQL statement. Since the code writes the variables on lines `1793` through `1795` into the `sqlStatement` through string formatting, they are not passed as parameters to the `dbHandle.QueryRow()` function.
+
+Since we can control the value of `sourceOrDestId` from our unauthenticated request, we should be able to exploit this SQL injection vulnerability. We'll explore the exploitation technique in the next section.
+
+### Exploiting the SQL Injection Vulnerability

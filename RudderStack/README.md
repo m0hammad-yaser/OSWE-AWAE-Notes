@@ -113,3 +113,8 @@ User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128
 
 
 ```
+
+For our attack type, we'll select ***Cluster bomb***. We want to test all combinations of HTTP methods and URL paths. Let's move on to configuring the *Payloads*.
+- **For payload set 1**, we can use a `"Simple list"`. We'll add `"GET"` and `"POST"` to the list.
+- **For payload set 2**, we'll also use a `"Simple list"`. Let's click on `Load...`, then select `routes_clean.txt`. We want the slashes in our payload list to be sent as-is, rather than URL-encoded, so we'll need to scroll down and **uncheck `" [X] URL-encode these characters"`**.
+

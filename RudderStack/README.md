@@ -28,3 +28,13 @@ Our VM is running RudderStack `v1.2.5`, which contains a SQL injection vulnerabi
 Rather than working off of the CVE write up, we'll perform our own source code analysis to enumerate the application's unauthenticated endpoints and discover the SQL injection vulnerability.
 
 ### Discovering the SQL Injection Vulnerability
+We'll analyze the application as an **unauthenticated user**, starting by **enumerating API endpoints** and identifying which require authentication. RudderStack's **[official API documentation](https://www.rudderstack.com/docs/api/)**, found online, reveals that it uses **URL versioning** for its endpoints.
+
+If we want to discover all the endpoints in the application's source code, we can search for variations of `"/v1"`, `"/v2"`, and so on.
+
+We'll click on the *Search* icon in code-server, then click on the ellipsis to toggle additional search details.
+
+We want to find strings that match the expected endpoint format, so we'll type `/v1` in the *Search* field. We'll limit our search to source files by typing `*.go` in the `"files to include"` field. We'll exclude any test files, since they will likely contain duplicate results, by typing `*_test.go` in the `"files to exclude"` field.
+
+We have `40` results in `9` files. The first three results contain `Sprintf` calls that are constructing URL paths. After that, we'll notice multiple results in `gateway.go` containing strings that appear to be API paths passed to a `HandleFunc()` function. Let's analyze the start of the `StartWebHandler()` function, which contains most of the search results in `gateway.go`.
+

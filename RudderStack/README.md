@@ -367,3 +367,6 @@ uid=70(postgres) gid=70(postgres) groups=70(postgres),70(postgres)
 5bb0f9d91064:~/data$ 
 ```
 We now have a reverse shell.
+
+**Automation script:** 
+## Bypassing a Web Application Firewall

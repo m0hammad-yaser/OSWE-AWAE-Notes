@@ -104,3 +104,12 @@ Final version: [routes_clean.txt](https://github.com/m0hammad-yaser/OSWE-AWAE-No
 
 Now that we have our list, we'll use Burp Suite to send requests to every endpoint. After opening Burp Suite, let's open the embedded browser and navigate to `http://rudderstack:8080/` so that we have a request that we can send to *Intruder*.
 
+We want to send a request to each endpoint, so we'll need to add a payload marker (`§`) over the forward slash (`/`) on line one of the request. Each route also has an associated HTTP method. If we send a `GET` request to an endpoint that only handles `POST` requests, we might miss a valid API call. At the same time, fuzzing API endpoints with unexpected HTTP methods could also help us discover edge cases or bugs in the system. For those reasons, we'll also add a payload marker over `GET` on line one.
+
+```text
+§GET§ §/§ HTTP/1.1
+Host: rudderstack:8080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+
+
+```

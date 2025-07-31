@@ -126,3 +126,36 @@ The response body is `can't unmarshall body`. This is interesting since unmarsha
 
 Most of the other responses are `404`s or include some variation of `Failed to read writeKey`. This latter message may be tied to an API key or some form of authentication. If we sort the *Intruder* results by *Length*, we'll find **six** responses with a length of `195` that all include `can't unmarshall body` in the response.
 
+Let's send all six to *Repeater* so that we can keep track of them if we close the *Intruder* window.
+
+Our next step is to review the application's source code to determine what `content-type` we need to send on these requests. We'll return to our IDE and review `gateway.go`.
+```go
+1462  srvMux.HandleFunc("/v1/pending-events", WithContentType("application/json; charset=utf-8", gateway.pendingEventsHandler)).Methods("POST")
+1463  srvMux.HandleFunc("/v1/failed-events", WithContentType("application/json; charset=utf-8", gateway.fetchFailedEventsHandler)).Methods("POST")
+1464  srvMux.HandleFunc("/v1/warehouse/pending-events", gateway.whProxy.ServeHTTP).Methods("POST")
+1465  srvMux.HandleFunc("/v1/clear-failed-events", gateway.clearFailedEventsHandler).Methods("POST")
+```
+Line `1464` doesn't declare a content type for the `/v1/warehouse/pending-events` handler, unlike lines `1462` and `1463`, which set the expected content type as JSON. Since the majority of the other endpoints use JSON, we can try modifying our request to send JSON.
+
+In *Repeater*, let's add `Content-Type: application/json` to our request, a placeholder JSON body, and then click `Send`.
+```text
+POST /v1/warehouse/pending-events?triggerUpload=true HTTP/1.1
+Host: rudderstack:8080
+Content-Type: application/json
+Content-Length: 2
+
+{}
+```
+This time the application responded with `empty source id`:
+```text
+HTTP/1.1 400 Bad Request
+Content-Length: 16
+Content-Type: text/plain; charset=utf-8
+Date: Thu, 31 Jul 2025 18:12:25 GMT
+Vary: Origin
+X-Content-Type-Options: nosniff
+
+empty source id
+
+```
+Let's search for that string (`empty source id`) in our IDE.

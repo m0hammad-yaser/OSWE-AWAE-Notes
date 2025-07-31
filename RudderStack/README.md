@@ -161,4 +161,22 @@ empty source id
 Let's search for that string (`empty source id`) in our IDE.
 
 We receive **three** results in **two** files. The results in `warehouse.go` seem promising, as one of them includes `"pending-events"`. Let's click on the second result and analyze the source code.
-
+```go
+1673	// unmarshall body
+1674	var pendingEventsReq warehouseutils.PendingEventsRequestT
+1675	err = json.Unmarshal(body, &pendingEventsReq)
+1676	if err != nil {
+1677		pkgLogger.Errorf("[WH]: Error unmarshalling body: %v", err)
+1678		http.Error(w, "can't unmarshall body", http.StatusBadRequest)
+1679		return
+1680	}
+1681  
+1682	sourceID := pendingEventsReq.SourceID
+1683
+1684	// return error if source id is empty
+1685	if sourceID == "" {
+1686		pkgLogger.Errorf("[WH]: pending-events:  Empty source id")
+1687		http.Error(w, "empty source id", http.StatusBadRequest)
+1688		return
+1689	}
+```

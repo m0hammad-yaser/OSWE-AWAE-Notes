@@ -159,3 +159,6 @@ empty source id
 
 ```
 Let's search for that string (`empty source id`) in our IDE.
+
+We receive **three** results in **two** files. The results in `warehouse.go` seem promising, as one of them includes `"pending-events"`. Let's click on the second result and analyze the source code.
+

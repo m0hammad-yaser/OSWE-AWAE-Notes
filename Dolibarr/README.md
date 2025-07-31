@@ -442,3 +442,48 @@ Excellent. Our payload worked and we now have a reverse shell on the Dolibarr VM
 **Exploitation Script:** [rce_script.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/Dolibarr/rce_script.py)
 
 ## Filter Bypass Revisted (Other Ways)
+We will review other ways to bypass blocklist validation controls.
+### Using Reflection
+Many programming languages support reflection, which provides developers a way to modify an application programmatically at run-time. This feature allows for the creation of objects or invocation of methods.
+
+To bypass `dol_eval()` filters, we use `ReflectionFunction` with `urldecode()` to reference `exec()` without using its name directly. We then invoke the function using the arrow operator and pass in the desired command.
+
+```php
+(new ReflectionFunction(urldecode('%65%78%65%63')))->invoke('whoami');
+```
+### Different Encodings
+Besides URL-encoding, PHP offers other encoding methods that can help bypass `dol_eval()` blocklist restrictions. These include:
+
+* **Gzip encoding** using `gzencode()` and `gzdecode()`
+* **ROT13 encoding** with `str_rot13()`, allowing reversible obfuscation (e.g., `'exec'` becomes `'rkrp'`)
+* **Hex encoding**, where function names like `exec` are converted to hex and then decoded at runtime
+
+```php
+(new ReflectionFunction(str_rot13('rkrp')))->invoke('whoami');
+```
+These techniques enable function calls without using blocked keywords directly in the payload.
+
+### Alternate String Modifications
+Instead of encoding part of our payload, we could also use string manipulation to bypass the restrictions in `dol_eval()`. PHP includes many string functions that we could use in our payload to bypass the blocklist.
+
+We could use `str_replace()` to construct `"exec"` in a variety of ways.
+
+For example, we could reconstruct `"eval"` by replacing each occurrence of `"z"` with `"e"`, as shown below.
+```php
+(new ReflectionFunction(str_replace("z", "e","zxzc")))->invoke('hostname');
+```
+
+We could also use `implode()` to join an array of strings with a separator.
+```php
+(new ReflectionFunction(implode("x", array("e","ec"))))->invoke('hostname');
+```
+The example above constructs `"exec"` by joining `"e"` and `"ec"` with `"x"`.
+
+The last example we'll review involves `strip_tags()`. Most applications use this function to prevent XSS and code injection vulnerabilities. We can use the function in our payload to bypass the blocklist restrictions by including an HTML tag to break up `"exec"`.
+```php
+(new ReflectionFunction(strip_tags("ex<a>ec")))->invoke('hostname');
+```
+The `strip_tags()` function will remove `"<a>"` and return `"exec"`.
+
+In addition to providing multiple ways to bypass the blocklist in `dol_eval()`, many of these string functions allow us to avoid special characters. These payloads would allow us to target other parts of the application that call `dol_eval()` using the `$onlysimplestring` parameter with more restrictive values.
+

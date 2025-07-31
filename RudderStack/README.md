@@ -309,4 +309,4 @@ func setupDB(ctx context.Context, connInfo string) error {
 ```
 We could also consult the application's online documentation. In a black box assessment scenario, we could research the error message online to determine the database.
 
-Since our injection point is at the end of the SQL statement and we are dealing with a PostgreSQL database, we have the ability injecting a stacked queries. 
+Since our injection point is at the end of the SQL statement and we are dealing with a PostgreSQL database, we have the ability to inject stacked queries. 

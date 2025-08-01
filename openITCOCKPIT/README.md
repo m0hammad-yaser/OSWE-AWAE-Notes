@@ -358,3 +358,4 @@ You can verify the creds have been saved in the database by running:
 ┌──(kali㉿kali)-[~]
 └─$ 
 ```
+## RCE Hunting

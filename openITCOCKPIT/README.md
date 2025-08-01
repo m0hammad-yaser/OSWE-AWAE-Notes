@@ -228,3 +228,8 @@ kali@kali:~/packages$ cat ./lodash-3.9.3/perf/asset/perf-ui.js
 ```
 The `ui.buildPath` is set near the bottom of the file. A `switch` returns the value of the build variable by default if no other condition is `true`. The build variable is set near the beginning of the file and is obtained from `location.search` (the query string) and the value of the query string is parsed using regex. The regex looks for `"build="` in the query string and extracts the value. We do not find any other sanitization of the build variable in the code. At this point, we should have a path to DOM XSS through the `"build"` query parameter!
 
+#### Proof of Concept (PoC):
+```text
+https://openitcockpit/js/vendor/lodash/perf/index.html?build=%22%3E%3C/script%3E%3Cscript%3Ealert(1)%3C/script%3E
+```
+## Advanced XSS Exploitation

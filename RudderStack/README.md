@@ -478,4 +478,4 @@ id
 uid=70(postgres) gid=70(postgres) groups=70(postgres),70(postgres)
 
 ```
-**Automation Script:** 
+**Automation Script:** [rce_script_WAFbypass.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/RudderStack/rce_script_WAFbypass.py)

@@ -243,3 +243,36 @@ document.write('<script src="' + build + '"></script>');
 // Gives us document.write('<script src=""></script><script>alert(1)</script>"></script>');
 ```
 ## Advanced XSS Exploitation
+A reflected DOM-based XSS vulnerability provides limited opportunities. Let's discuss what we can and can't do at this point.
+
+First, we will need a victim to exploit. Unlike stored XSS, which can exploit anyone who visits the page, we will have to craft a specific link to send to a victim. Once the victim visits the page, the XSS will be triggered.
+
+**Summary of Reflected DOM-based XSS Exploit Strategy:**
+
+This document outlines a strategy for exploiting a **reflected DOM-based XSS vulnerability**, which requires crafting and delivering a malicious link to a **specific victim** (unlike stored XSS which affects all visitors). Key points include:
+
+1. **Session Cookie Access is Restricted**:
+   The session cookie (`itnovum`) has the `HttpOnly` flag, preventing direct access via JavaScript. Therefore, stealing cookies isn’t feasible.
+
+2. **Alternative Exploitation via the DOM and Same-Origin Policy (SOP)**:
+   Although JavaScript can't read the session cookie, it can still **load and access authenticated content** from the same origin via `XHR` or `fetch`, since the browser sends the session cookie with those requests. This allows scraping authenticated pages if the victim is logged in.
+
+3. **Attack Strategy**:
+
+   * Use XSS to inject a script into a legitimate page.
+   * The script loads and scrapes authenticated content from the same origin.
+   * Collected data is **exfiltrated to an attacker-controlled server**.
+
+4. **Implementation Plan**:
+
+   * Build a custom tool (instead of using frameworks like BeEF), including:
+
+     * **XSS Payload Script**: Injected into the victim's session.
+     * **Flask API Server**: Receives and stores scraped data.
+     * **SQLite Database**: Stores data for future use.
+   * Ensure the **XSS page looks legitimate** to keep the victim engaged.
+   * Include a script to **rebuild remote HTML locally** from the scraped data.
+   * Write reusable and modular code for extensibility.
+
+**Goal**: Extract and reconstruct authenticated content by leveraging an XSS payload within the boundaries of browser security policies.
+### Writing to DOM

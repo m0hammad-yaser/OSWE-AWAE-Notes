@@ -278,3 +278,28 @@ This document outlines a strategy for exploiting a **reflected DOM-based XSS vul
 ### Writing to DOM
 Using the document interface, we can query for HTML elements via the `getElementByID` and `getElementsByTagName` methods. We can change the content of an HTML element with the `innerHTML` property. We can also create new elements with `createElement` method.
 
+For example, we can query for all `"body"` elements using:
+```javascript
+>> document.getElementsByTagName("body")[0]
+<- <body>
+```
+We can save the reference to the object by prepending the command with:
+```javascript
+>> body = document.getElementsByTagName("body")[0]
+<- <body>
+```
+Next, we can get the contents of `body` by accessing the `innerHTML` property.
+```javascript
+>> body.innerHTML
+<- "
+    <div id=\"perf-toolbar\"><span style=\"float: right;\">
+    ...
+    </script>
+  "
+```
+We can also overwrite the HTML in body by setting `innerHTML` equal to a string of valid HTML.
+```javascript
+>> body.innerHTML = "<h1>Magic!</h1>"
+<- "<h1>Magic!</h1>"
+```
+Using this method, we can control every aspect of the user experience. Later, we will expand on these concepts and use XHR requests to retrieve content in a way the victim won't notice.

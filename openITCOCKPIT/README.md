@@ -73,4 +73,5 @@ https://openitcockpit/js/vendor/bootstrap-daterangepicker
 ```
 Next, we need to find a suitable wordlist. The wordlist must include common file names like `README.md`, which might contain a version number of the library.
 
-We'll use the `[quickhits.txt](https://raw.githubusercontent.com/danielmiessler/SecLists/refs/heads/master/Discovery/Web-Content/quickhits.txt)` list from the seclists project. The `quickhits.txt` wordlist is located in `/usr/share/seclists/Discovery/Web-Content/` on Kali.
+We'll use the [quickhits.txt](https://raw.githubusercontent.com/danielmiessler/SecLists/refs/heads/master/Discovery/Web-Content/quickhits.txt) list from the seclists project. The `quickhits.txt` wordlist is located in `/usr/share/seclists/Discovery/Web-Content/` on Kali.
+

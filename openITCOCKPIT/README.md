@@ -39,3 +39,38 @@ We will use `names.json`, we can use `jq` to grab only the top 10000, filter onl
 ```bash
 kali@kali:~$ jq '.[0:10000]' names.json | grep ","| cut -d'"' -f 2 > npm-10000.txt
 ```
+Using the top 10,000 npm packages, we'll search for any other packages in the `/js/vendor/` directory with `gobuster`.
+```bash
+┌──(kali㉿kali)-[~]
+└─$ gobuster dir -w ./npm-10000.txt -u https://openitcockpit/js/vendor/ -k 
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+...
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/lodash               (Status: 301) [Size: 178] [--> https://openitcockpit/js/vendor/lodash/]
+/gauge                (Status: 301) [Size: 178] [--> https://openitcockpit/js/vendor/gauge/]
+/bootstrap-daterangepicker (Status: 301) [Size: 178] [--> https://openitcockpit/js/vendor/bootstrap-daterangepicker/]
+Progress: 9999 / 10000 (99.99%)
+===============================================================
+Finished
+===============================================================
+```
+Gobuster identified a new package, `"bootstrap-daterangepicker"`. Unlike `UUID.js`, most vendor libraries don’t include version info in their directory names. To find the exact versions, we'll brute-force files in each library directory using Gobuster, allowing us to download the exact copies from the openITCOCKPIT server.
+
+To accomplish this, we will first start by creating a list of URLs that contain the packages we are targeting. Later, we'll use this list as input into Gobuster in the URL flag.
+```bash
+kali@kali:~$ cat packages.txt 
+https://openitcockpit/js/vendor/fineuploader
+https://openitcockpit/js/vendor/gauge
+https://openitcockpit/js/vendor/gridstack
+https://openitcockpit/js/vendor/lodash
+https://openitcockpit/js/vendor/UUID.js-4.0.3
+https://openitcockpit/js/vendor/bootstrap-daterangepicker
+```
+Next, we need to find a suitable wordlist. The wordlist must include common file names like `README.md`, which might contain a version number of the library.
+
+We'll use the `quickhits.txt` list from the seclists project. The `quickhits.txt` wordlist is located in `/usr/share/seclists/Discovery/Web-Content/` on Kali.

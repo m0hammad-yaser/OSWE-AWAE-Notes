@@ -75,3 +75,39 @@ Next, we need to find a suitable wordlist. The wordlist must include common file
 
 We'll use the [quickhits.txt](https://raw.githubusercontent.com/danielmiessler/SecLists/refs/heads/master/Discovery/Web-Content/quickhits.txt) list from the seclists project. The `quickhits.txt` wordlist is located in `/usr/share/seclists/Discovery/Web-Content/` on Kali.
 
+```bash
+┌──(kali㉿kali)-[~]
+└─$ while read l; do echo "===$l==="; gobuster dir -w /usr/share/seclists/Discovery/Web-Content/quickhits.txt -k -q -u $l; done < packages.txt
+===https://openitcockpit/js/vendor/fineuploader===
+===https://openitcockpit/js/vendor/gauge===
+===https://openitcockpit/js/vendor/gridstack===
+/bower.json           (Status: 200) [Size: 664]
+/demo                 (Status: 301) [Size: 178] [--> https://openitcockpit/js/vendor/gridstack/demo/]
+/dist/                (Status: 403) [Size: 162]
+/README.md            (Status: 200) [Size: 22599]
+===https://openitcockpit/js/vendor/lodash===
+/.editorconfig        (Status: 200) [Size: 321]
+/.gitattributes       (Status: 200) [Size: 12]
+/.gitignore           (Status: 200) [Size: 67]
+/.travis.yml          (Status: 200) [Size: 4874]
+/bower.json           (Status: 200) [Size: 284]
+/CONTRIBUTING.md      (Status: 200) [Size: 2402]
+/package.json         (Status: 200) [Size: 586]
+/README.md            (Status: 200) [Size: 1458]
+/test                 (Status: 301) [Size: 178] [--> https://openitcockpit/js/vendor/lodash/test/]
+/test/                (Status: 403) [Size: 162]
+===https://openitcockpit/js/vendor/UUID.js-4.0.3===
+/.gitignore           (Status: 200) [Size: 34]
+/bower.json           (Status: 200) [Size: 498]
+/dist/                (Status: 403) [Size: 162]
+/LICENSE.txt          (Status: 200) [Size: 11357]
+/package.json         (Status: 200) [Size: 1010]
+/README.md            (Status: 200) [Size: 5039]
+/test                 (Status: 301) [Size: 178] [--> https://openitcockpit/js/vendor/UUID.js-4.0.3/test/]
+/test/                (Status: 403) [Size: 162]
+===https://openitcockpit/js/vendor/bootstrap-daterangepicker===
+/README.md            (Status: 200) [Size: 2796]
+                                                                                                                          
+┌──(kali㉿kali)-[~]
+└─$ 
+```

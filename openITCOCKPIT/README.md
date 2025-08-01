@@ -276,3 +276,5 @@ This document outlines a strategy for exploiting a **reflected DOM-based XSS vul
 
 **Goal**: Extract and reconstruct authenticated content by leveraging an XSS payload within the boundaries of browser security policies.
 ### Writing to DOM
+Using the document interface, we can query for HTML elements via the `getElementByID` and `getElementsByTagName` methods. We can change the content of an HTML element with the `innerHTML` property. We can also create new elements with `createElement` method.
+

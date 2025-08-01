@@ -113,3 +113,28 @@ We'll use the [quickhits.txt](https://raw.githubusercontent.com/danielmiessler/S
 ```
 Gobuster did not discover any directories or files for the `fineuploader` or `gauge` libraries, but it discovered a `README.md` under `gridstack`, `lodash`, `UUID.js-4.0.3`, and `bootstrap-daterangepicker`.
 
+Before proceeding, we will remove `fineuploader` and `gauge` from `packages.txt` since we did not discover any files we could use. We'll also remove `UUID.js-4.0.3` since we are already certain the version is `4.0.3`.
+
+```bash
+kali@kali:~$ cat packages.txt 
+https://openitcockpit/js/vendor/gridstack
+https://openitcockpit/js/vendor/lodash
+https://openitcockpit/js/vendor/bootstrap-daterangepicker
+```
+
+Next, we'll use the same while loop to run curl on each URL, appending `/README.md`.
+```bash
+kali@kali:~$ while read l; do echo "===$l==="; curl $l/README.md -k; done < packages.txt
+===https://openitcockpit/js/vendor/gridstack===
+...
+- [Changes](#changes)
+      - [v0.2.3 (development version)](#v023-development-version)
+...
+===https://openitcockpit/js/vendor/lodash===
+# lodash v3.9.3
+...
+
+===https://openitcockpit/js/vendor/bootstrap-daterangepicker===
+...
+```
+We found version numbers for `gridstack` and `lodash` but unfortunately, we could not determine version information for `bootstrap-daterangepicker`. 

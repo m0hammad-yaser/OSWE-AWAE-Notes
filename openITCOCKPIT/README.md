@@ -111,3 +111,5 @@ We'll use the [quickhits.txt](https://raw.githubusercontent.com/danielmiessler/S
 ┌──(kali㉿kali)-[~]
 └─$ 
 ```
+Gobuster did not discover any directories or files for the `fineuploader` or `gauge` libraries, but it discovered a `README.md` under `gridstack`, `lodash`, `UUID.js-4.0.3`, and `bootstrap-daterangepicker`.
+

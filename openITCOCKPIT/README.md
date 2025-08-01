@@ -11,8 +11,8 @@ To discover exposed endpoints, start by visiting the application's home page and
 Let's visit `http://openitcockpit` in Firefox while proxying through BurpSuite to create a basic sitemap. The proxy will capture all the requests and resources that are loaded and display them in the `Target` > `Sitemap tab`.
 
 **This initial connection reveals several things:**
-- The vendor dependencies are stored in the lib and vendor directories.
-- Application-specific JavaScript appears located in the js directory.
+- The vendor dependencies are stored in the `/lib` and `/vendor` directories.
+- Application-specific JavaScript appears located in the `/js` directory.
 
 Let's load a page that should not exist (like `/thispagedoesnotexist`) to determine the format of a `404` page.
 

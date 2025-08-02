@@ -370,7 +370,7 @@ var attacker = '192.168.45.249' // CHANGE ME
 ...
 ```
 
-Note: place [api.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/api.py), [db.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/db.py) and [client.js](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/client.js) in the same directory.
+Note: place [api.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/api.py), [stealLoginPageContnet.js](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/stealLoginPageContnet.js), [db.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/db.py) and [client.js](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/client.js) in the same directory.
 
 As a victim, visit:
 ```text

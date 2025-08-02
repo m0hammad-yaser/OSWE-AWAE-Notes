@@ -438,3 +438,16 @@ Then we'll `grep` for all script tags that also have a `src` set, removing any e
 ```bash
 cat commands.html | grep -E "script.*src" | grep -Ev "vendor|lib|plugin"
 ```
+Output:
+```bash
+text/javascript" src="/frontend/js/bootstrap.js?v3.7.2"></script>
+        <script type="text/javascript" src="/js/app/bootstrap.js?v3.7.2"></script>
+        <script type="text/javascript" src="/js/app/layoutfix.js?v3.7.2"></script>
+        <script type="text/javascript" src="/smartadmin/js/notification/SmartNotification.js?v3.7.2"></script>
+        <script type="text/javascript" src="/smartadmin/js/demo.js?v3.7.2"></script>
+        <script type="text/javascript" src="/smartadmin/js/app.js?v3.7.2"></script>
+        <script type="text/javascript" src="/smartadmin/js/smartwidgets/jarvis.widget.js?v3.7.2"></script>
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$ 
+```

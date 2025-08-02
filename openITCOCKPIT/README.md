@@ -699,3 +699,4 @@ The `_onConnectionOpen` function simply calls `requestUniqId`, which sends a req
 ### Interacting With the WebSocket Server
 Now that we understand WebSocket requests, we can begin to interact with the server. Although BurpSuite can interact with a WebSocket server, the user interface is not ideal for our situation. BurpSuite also lacks a WebSocket *Intruder*. Because of these limitations, we will instead build our own client in Python.
 #### Building a Client
+We will build a script that allows us to connect and send any command as `"input"`. This will help us learn how the server sends its responses.

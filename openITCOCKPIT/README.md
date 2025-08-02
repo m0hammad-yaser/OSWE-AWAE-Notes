@@ -725,5 +725,40 @@ whoami
 >>> ERROR: Forbidden command!
 
 ```
-### Attempting to Inject Commands
+
 Now we have an interactive WebSocket connection where we can begin testing the input and finding allowed commands.
+Lets fuzz to see the allowed commands using [cmd_fuzzer.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/cmd_fuzzer.py) passing this wordlist of common Linux commands [commands.txt](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/commands.txt)
+
+Output:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 cmd_fuzzer.py --url wss://openitcockpit/sudo_server -k 1fea123e07f730f76e661bced33a94152378611e -w commands.txt
+Trying: ls
+[+] Allowed command: ls
+
+[+] Fuzzing completed.
+                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$ 
+```
+### Attempting to Inject Commands
+At this point, we should have discovered that ls is a valid command. Let's try to escape the command using common injection techniques.
+
+The text explains that command injection can be done using operators like `&&` (executes next command if the previous succeeds) and `||` (executes next command if the previous fails). Instead of testing each technique manually, it's more efficient to use a curated list to brute-force various injection methods.
+
+We will use this script [bypass_cmd_inj_fuzzer.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/bypass_cmd_inj_fuzzer.py) with this wordlist [command-injection-template.txt](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/command-injection-template.txt) 
+
+The list uses a template where the `{cmd}` variable can be replaced. By looping through each of these injection templates, sending it to the server, and inspecting the response, we can discover if any of the techniques allows for us to inject into the template.
+
+Output:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 bypass_cmd_inj_fuzzer.py --url wss://openitcockpit/sudo_server -k 1fea123e07f730f76e661bced33a94152378611e --cmd whoami 
+
+[-] All payloads were rejected.
+                                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$ 
+```
+None of the command injection techniques worked.
+### RCE -- Degging Deeper

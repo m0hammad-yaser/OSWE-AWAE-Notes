@@ -656,7 +656,7 @@ The `toJson` function converts a task (like `execute_nagios_command`) and some i
 ```
 The `_onResponse` function runs when a message is received. It sets `uniqid` using a value sent by the server. The server is expected to send this `uniqid` during the connection. Additionally, the server can send five types of responses: `connection`, `response`, `dispatcher`, `event`, and `keepAlive` — this detail is noted for future reference.
 
-Now let's determine the source of the `_key` value. The setup function in the same `components.js` file provides some clues:
+Now let's determine the source of the `_key` value. The `setup` function in the same `components.js` file provides some clues:
 ```javascript
 1260  setup: function(wsURL, key) {
 1261      this._wsUrl = wsURL;

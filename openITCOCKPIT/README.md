@@ -742,9 +742,9 @@ Trying: ls
 └─$ 
 ```
 ### Attempting to Inject Commands
-At this point, we should have discovered that ls is a valid command. Let's try to escape the command using common injection techniques.
+At this point, we should have discovered that **`ls`** is a valid command. Let's try to escape the command using common injection techniques.
 
-The text explains that command injection can be done using operators like `&&` (executes next command if the previous succeeds) and `||` (executes next command if the previous fails). Instead of testing each technique manually, it's more efficient to use a curated list to brute-force various injection methods.
+One way to inject into a command is with operators like `&&` and `||`, which `"stack"` commands. The `&&` operator will run a command if the previous command was successful and `||` will run a command if the previous command was unsuccessful. While there are other command injection techniques, testing each one individually is unnecessary when we can use a curated list to brute force all possible injection techniques.
 
 We will use this script [bypass_cmd_inj_fuzzer.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/bypass_cmd_inj_fuzzer.py) with this wordlist [command-injection-template.txt](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/command-injection-template.txt) 
 

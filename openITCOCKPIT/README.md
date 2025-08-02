@@ -719,8 +719,11 @@ use this client script: [wsclient_rce.py](https://github.com/m0hammad-yaser/OSWE
 Usage:
 ```bash
 ┌──(kali㉿kali)-[~]
-└─$ python3 wsclient.py           
+└─$ python3 wsclient.py
 >>> [+] Connected!
+whoami
+>>> ERROR: Forbidden command!
 
 ```
 ### Attempting to Inject Commands
+Now we have an interactive WebSocket connection where we can begin testing the input and finding allowed commands.

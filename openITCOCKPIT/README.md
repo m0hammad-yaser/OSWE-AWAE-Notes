@@ -440,7 +440,12 @@ cat commands.html | grep -E "script.*src" | grep -Ev "vendor|lib|plugin"
 ```
 Output:
 ```bash
-text/javascript" src="/frontend/js/bootstrap.js?v3.7.2"></script>
+┌──(kali㉿kali)-[~]
+└─$ cat commands.html | grep -E "script.*src" | grep -Ev "vendor|lib|plugin" 
+<script type="text/javascript" src="/js/app/app_controller.js?v3.7.2"></script>
+<script type="text/javascript" src="/js/compressed_components.js?v3.7.2"></script>
+<script type="text/javascript" src="/js/compressed_controllers.js?v3.7.2"></script>
+</script><script type="text/javascript" src="/frontend/js/bootstrap.js?v3.7.2"></script>
         <script type="text/javascript" src="/js/app/bootstrap.js?v3.7.2"></script>
         <script type="text/javascript" src="/js/app/layoutfix.js?v3.7.2"></script>
         <script type="text/javascript" src="/smartadmin/js/notification/SmartNotification.js?v3.7.2"></script>

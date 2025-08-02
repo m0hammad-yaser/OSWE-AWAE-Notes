@@ -508,3 +508,42 @@ pip3 install jsbeautifier
 ```
 Now that we have a readable version of the custom JavaScript, we can begin reviewing the files. Our goal is to determine how the WebSocket server works in order to be able to interact with it. From this point forward, we will analyze the uncompressed files.
 ### Analyzing JavaScript
+WebSocket communicaton can be initiated with JavaScript by running `new WebSocket`. As we search through the files, we'll use this information to discover clues about the configuration of the `"sudo_server"` WebSocket.
+
+A manual review of the files leads us to `components.js`. Lines `1248` to `1331` define the component named `WebsocketSudoComponent` and the functions used to send messages, parse responses, and manage the data coming in and going out to the WebSocket server:
+```javascript
+1248  App.Components.WebsocketSudoComponent = Frontend.Component.extend({
+...
+1273      send: function(json, connection) {
+1274          connection = connection || this._connection;
+1275          connection.send(json)
+1276      },
+...
+1331  });
+```
+`WebsocketSudoComponent` also defines the function for sending messages to the WebSocket server. In order to discover the messages that are available to be sent to the server, we can search for any calls to the `.send()` function. To do this, we'll `grep` for `"send("` in the uncompressed files.
+```bash
+┌──(kali㉿kali)-[~/custom_js]
+└─$ grep -r  "send(" ./ --exclude="compressed*"
+./pretty/angular_services.js: _send(JSON.stringify({
+./pretty/angular_services.js: _send(JSON.stringify({
+./pretty/angular_services.js: _connection.send(json)
+./pretty/angular_services.js: _send(json)
+./pretty/angular_services.js: _send(JSON.stringify({
+./pretty/angular_services.js: _connection.send(json)
+./pretty/angular_services.js: _send(json)
+./pretty/components.js:  connection.send(json)
+./pretty/components.js:  this.send(this.toJson('requestUniqId', ''))
+./pretty/components.js:  this.send(this.toJson('keepAlive', ''))
+./pretty/components.js:  this._connection.send(jsonArr);
+./pretty/controllers.js: self.WebsocketSudo.send(self.WebsocketSudo.toJson('5238f8e57e72e81d44119a8ffc3f98ea', {
+./pretty/controllers.js: self.WebsocketSudo.send(self.WebsocketSudo.toJson('package_uninstall', {
+./pretty/controllers.js: self.WebsocketSudo.send(self.WebsocketSudo.toJson('package_install', {
+./pretty/controllers.js: self.WebsocketSudo.send(self.WebsocketSudo.toJson('d41d8cd98f00b204e9800998ecf8427e', {
+./pretty/controllers.js: self.WebsocketSudo.send(self.WebsocketSudo.toJson('apt_get_update', ''))
+./pretty/controllers.js: this.WebsocketSudo.send(this.WebsocketSudo.toJson('nagiostats', []))
+...
+./pretty/angular_directives.js:  SudoService.send(SudoService.toJson('enableOrDisableHostFlapdetection', [object.Host.uuid, 1]))
+./pretty/angular_directives.js:  SudoService.send(SudoService.toJson('enableOrDisableHostFlapdetection', [object.Host.uuid, 0]))
+...
+```

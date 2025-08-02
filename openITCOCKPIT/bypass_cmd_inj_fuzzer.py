@@ -3,7 +3,7 @@
 
 """
 Usage:
-python3 fuzz.py --url wss://openitcockpit/sudo_server -k 1fea123e07f730f76e661bced33a94152378611e --cmd whoami
+python3 bypass_cmd_inj_fuzzer.py --url wss://openitcockpit/sudo_server -k 1fea123e07f730f76e661bced33a94152378611e --cmd whoami
 """
 
 import argparse

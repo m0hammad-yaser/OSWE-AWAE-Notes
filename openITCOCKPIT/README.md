@@ -456,3 +456,20 @@ Output:
 ┌──(kali㉿kali)-[~]
 └─$ 
 ```
+This leaves us with a more manageable list, but there are some false positives that we can remove. The `/smartadmin` folder is an openITCOCKPIT theme (clarified with a Google search), so we can remove that. We'll save the final list of custom JavaScript files to `list.txt`:
+```bash
+kali@kali:~/scripts/content/custom_js$ cat list.txt 
+https://openitcockpit/js/app/app_controller.js
+https://openitcockpit/js/compressed_components.js
+https://openitcockpit/js/compressed_controllers.js
+https://openitcockpit/frontend/js/bootstrap.js
+https://openitcockpit/js/app/bootstrap.js
+https://openitcockpit/js/app/layoutfix.js
+https://openitcockpit/js/compressed_angular_services.js
+https://openitcockpit/js/compressed_angular_directives.js
+https://openitcockpit/js/compressed_angular_controllers.js
+```
+It's very rare for client-side JavaScript files to be protected behind authentication. We should be able to retrieve the files without authentication. We'll use `wget` to download the list of custom JavaScript into the `custom_js` folder:
+```bash
+wget --no-check-certificate -q -i list.txt
+```

@@ -712,6 +712,6 @@ Now that we understand WebSocket requests, we can begin to interact with the ser
   "key": "1fea123e07f730f76e661bced33a94152378611e"
 }
 ```
-5. Response received in the History tab (On your righthand)
+5. Response received in the History tab (On your right hand)
 #### Building a Client
 We will build a script that allows us to connect and send any command as `"input"`. This will help us learn how the server sends its responses.

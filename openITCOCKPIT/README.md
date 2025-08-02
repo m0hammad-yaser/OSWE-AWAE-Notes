@@ -576,3 +576,20 @@ The output reveals a list of useful commands. Removing the false positives, clea
 ./pretty/angular_directives.js: enableOrDisableHostFlapdetection
 ```
 Although many of these seem interesting, the commands specifically listed in `controllers.js` seem to run system-level commands, so this is where we will focus our attention.
+
+The `execute_nagios_command` command seems to indicate that it triggers some form of command execution. Opening the `controllers.js` file and searching for `"execute_nagios_command"` leads us to the content:
+```javascript
+loadConsole: function() {
+    this.$jqconsole = $('#console').jqconsole('', 'nagios$ ');
+    this.$jqconsole.Write(this.getVar('console_welcome'));
+    var startPrompt = function() {
+        var self = this;
+        self.$jqconsole.Prompt(!0, function(input) {
+            self.WebsocketSudo.send(self.WebsocketSudo.toJson('execute_nagios_command', input));
+            startPrompt()
+        })
+    }.bind(this);
+    startPrompt()
+},
+```
+A closer inspection of this code confirms that this function may result in RCE.

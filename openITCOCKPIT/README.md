@@ -547,3 +547,32 @@ A manual review of the files leads us to `components.js`. Lines `1248` to `1331`
 ./pretty/angular_directives.js:  SudoService.send(SudoService.toJson('enableOrDisableHostFlapdetection', [object.Host.uuid, 0]))
 ...
 ```
+The output reveals a list of useful commands. Removing the false positives, cleaning up the code, and removing duplicate values provides us with the manageable list of commands:
+```bash
+./pretty/components.js:         requestUniqId
+./pretty/components.js:         keepAlive
+./pretty/controllers.js:        5238f8e57e72e81d44119a8ffc3f98ea
+./pretty/controllers.js:        package_uninstall
+./pretty/controllers.js:        package_install
+./pretty/controllers.js:        d41d8cd98f00b204e9800998ecf8427e
+./pretty/controllers.js:        apt_get_update
+./pretty/controllers.js:        nagiostats
+./pretty/controllers.js:        execute_nagios_command
+./pretty/angular_directives.js: sendCustomHostNotification
+./pretty/angular_directives.js: submitHoststateAck
+./pretty/angular_directives.js: submitEnableServiceNotifications
+./pretty/angular_directives.js: commitPassiveResult
+./pretty/angular_directives.js: sendCustomServiceNotification
+./pretty/angular_directives.js: submitDisableServiceNotifications
+./pretty/angular_directives.js: submitDisableHostNotifications
+./pretty/angular_directives.js: enableOrDisableServiceFlapdetection
+./pretty/angular_directives.js: rescheduleService
+./pretty/angular_directives.js: submitServiceDowntime
+./pretty/angular_directives.js: submitHostDowntime
+./pretty/angular_directives.js: commitPassiveServiceResult
+./pretty/angular_directives.js: submitEnableHostNotifications
+./pretty/angular_directives.js: submitServicestateAck
+./pretty/angular_directives.js: rescheduleHost
+./pretty/angular_directives.js: enableOrDisableHostFlapdetection
+```
+Although many of these seem interesting, the commands specifically listed in `controllers.js` seem to run system-level commands, so this is where we will focus our attention.

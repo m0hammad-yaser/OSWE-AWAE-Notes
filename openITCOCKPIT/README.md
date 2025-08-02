@@ -714,3 +714,12 @@ Now that we understand WebSocket requests, we can begin to interact with the ser
 5. Response received in the History tab (On your right hand)
 #### Building a Client
 We will build a script that allows us to connect and send any command as `"input"`. This will help us learn how the server sends its responses.
+use this client script: [wsclient_rce.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/wsclient_rce.py) 
+
+Usage:
+```bash
+┌──(kali㉿kali)-[~]
+└─$ python3 wsclient.py           
+>>> [+] Connected!
+
+```

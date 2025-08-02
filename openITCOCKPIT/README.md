@@ -471,5 +471,14 @@ https://openitcockpit/js/compressed_angular_controllers.js
 ```
 It's very rare for client-side JavaScript files to be protected behind authentication. We should be able to retrieve the files without authentication. We'll use `wget` to download the list of custom JavaScript into the `custom_js` folder:
 ```bash
-wget --no-check-certificate -q -i list.txt
+wget --no-check-certificate -q -i ~/list.txt
+```
+```bash
+┌──(kali㉿kali)-[~/custom_js]
+└─$ ls         
+app_controller.js  bootstrap.js.1                     compressed_angular_directives.js  compressed_components.js   layoutfix.js
+bootstrap.js       compressed_angular_controllers.js  compressed_angular_services.js    compressed_controllers.js
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~/custom_js]
+└─$ 
 ```

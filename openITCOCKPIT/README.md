@@ -697,3 +697,5 @@ The `connect` function establishes a new WebSocket connection if one isn't alrea
 ```
 The `_onConnectionOpen` function simply calls `requestUniqId`, which sends a request to the server for a unique ID. This step is essential to remember when interacting with the WebSocket server.
 ### Interacting With the WebSocket Server
+Now that we understand WebSocket requests, we can begin to interact with the server. Although BurpSuite can interact with a WebSocket server, the user interface is not ideal for our situation. BurpSuite also lacks a WebSocket *Intruder*. Because of these limitations, we will instead build our own client in Python.
+#### Building a Client

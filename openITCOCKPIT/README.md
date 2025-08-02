@@ -475,9 +475,33 @@ wget --no-check-certificate -q -i ~/list.txt
 ```
 ```bash
 ┌──(kali㉿kali)-[~/custom_js]
-└─$ ls         
-app_controller.js  bootstrap.js.1                     compressed_angular_directives.js  compressed_components.js   layoutfix.js
-bootstrap.js       compressed_angular_controllers.js  compressed_angular_services.js    compressed_controllers.js
+└─$ ls -lah             
+total 688K
+drwxrwxr-x  2 kali kali 4.0K Aug  2 12:28 .
+drwx------ 30 kali kali 4.0K Aug  2 12:28 ..
+-rw-rw-r--  1 kali kali 8.4K Oct 25  2019 app_controller.js
+-rw-rw-r--  1 kali kali  220 Oct 25  2019 bootstrap.js
+-rw-rw-r--  1 kali kali  301 Oct 25  2019 bootstrap.js.1
+-rw-rw-r--  1 kali kali 207K Feb  7  2020 compressed_angular_controllers.js
+-rw-rw-r--  1 kali kali 127K Feb  7  2020 compressed_angular_directives.js
+-rw-rw-r--  1 kali kali 6.4K Feb  7  2020 compressed_angular_services.js
+-rw-rw-r--  1 kali kali  59K Feb  7  2020 compressed_components.js
+-rw-rw-r--  1 kali kali 252K Feb  7  2020 compressed_controllers.js
+-rw-rw-r--  1 kali kali 3.9K Oct 25  2019 layoutfix.js
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~/custom_js]
+└─$
+```
+There are multiple files named `bootstrap.js`, but the content is minimal and can be ignored. The `"compressed*"` files contain hard-to-read, compressed, JavaScript code. We'll use the `js-beautify` Python script to `"pretty-print"` the files into uncompressed variants:
+```bash
+pip3 install jsbeautifier
+```
+```bash
+┌──(kali㉿kali)-[~/custom_js]
+└─$ mkdir pretty   
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~/custom_js]
+└─$ for f in compressed_*.js; do js-beautify $f > pretty/"${f//compressed_}"; done;
                                                                                                                                                                                              
 ┌──(kali㉿kali)-[~/custom_js]
 └─$ 

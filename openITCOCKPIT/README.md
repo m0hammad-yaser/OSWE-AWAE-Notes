@@ -418,3 +418,5 @@ WebSocket is a browser-supported communication protocol that uses HTTP for the i
 
 WebSocket communication is often ignored in pentests, despite its potential to control a server like HTTP. Tools like BurpSuite historically lacked support (*Repeater* only recently added it; *Intruder* still doesn't). Discovering a WebSocket endpoint and key can greatly raise an application's risk.
 
+In browser-based apps, WebSocket connections are initiated through JavaScript. Because JavaScript isn't compiled, the WebSocket connection details can be found in the loaded JavaScript files. These files can be analyzed to understand the communication and build a custom client.
+

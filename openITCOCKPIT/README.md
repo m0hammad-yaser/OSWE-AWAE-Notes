@@ -420,3 +420,21 @@ WebSocket communication is often ignored in pentests, despite its potential to c
 
 In browser-based apps, WebSocket connections are initiated through JavaScript. Because JavaScript isn't compiled, the WebSocket connection details can be found in the loaded JavaScript files. These files can be analyzed to understand the communication and build a custom client.
 
+The `commands.html` page loads many JavaScript files, but most are plugins and libraries. However, a cluster of JavaScript files just before the end of the head tag do not seem to load plugins or libraries:
+```html
+<script src="/vendor/angular/angular.min.js"></script><script src="/js/vendor/vis-4.21.0/dist/vis.js"></script><script src="/js/scripts/ng.app.js"></script><script src="/vendor/javascript-detect-element-resize/jquery.resize.js"></script><script src="/vendor/angular-gridster/dist/angular-gridster.min.js"></script><script src="/js/lib/angular-nestable.js"></script><script src="/js/compressed_angular_services.js"></script><script src="/js/compressed_angular_directives.js"></script><script src="/js/compressed_angular_controllers.js"></script>
+```
+custom JavaScript is stored in the `/js` folder and not in `/vendor`, `/plugin`, or `/lib`.
+
+We will `wget` the `commands.html` page:
+```bash
+wget \
+  --header="Cookie: itnovum=rvbd1k5hffibjp1no5efbrhril; CT[CTUser]=Q2FrZQ%3D%3D.bCAYcOnyK55zpjwEiRrFB7y1o2vhtYDUHDDCUrrAZZ4fbwHEBuT4mP7YB8Xiry2ObYn46dj3SDXS0bHGS73WiwsLVtVb2MG3HzxBO1zSDwKx5GR%2FlLjsx23vQih53g%3D%3D" \
+  --no-check-certificate \
+  https://openitcockpit/commands -O commands.html
+
+```
+Then we'll `grep` for all script tags that also have a `src` set, removing any entries that are in the `/vendor`, `/plugin`, or `/lib` folders:
+```bash
+cat commands.html | grep -E "script.*src" | grep -Ev "vendor|lib|plugin"
+```

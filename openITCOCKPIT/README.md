@@ -404,3 +404,5 @@ You can verify the creds have been saved in the database by running:
 └─$ 
 ```
 ## RCE Hunting
+Now that we have access to the content of an authenticated user, we can start hunting for something that will lead us closer to running system commands. First, we'll inspect the pages we currently have access to.
+### Discovery

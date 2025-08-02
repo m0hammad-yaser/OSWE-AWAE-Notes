@@ -702,16 +702,15 @@ Now that we understand WebSocket requests, we can begin to interact with the ser
 1. In *Proxy* > *WebSockets history*
 2. Choose any request with `➡️ To server`
 3. Send to *Repeater* (You might need to press `Reconnect` button)
-4. Craft you rquest and click `Send`
-   Example request:
-```json
-{
-  "task": "execute_nagios_command",
-  "data": "ls",
-  "uniqid": "",
-  "key": "1fea123e07f730f76e661bced33a94152378611e"
-}
-```
+4. Craft you rquest and click `Send`, Example request:
+  ```json
+  {
+    "task": "execute_nagios_command",
+    "data": "ls",
+    "uniqid": "",
+    "key": "1fea123e07f730f76e661bced33a94152378611e"
+  }
+  ```
 5. Response received in the History tab (On your right hand)
 #### Building a Client
 We will build a script that allows us to connect and send any command as `"input"`. This will help us learn how the server sends its responses.

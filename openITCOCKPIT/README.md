@@ -506,3 +506,5 @@ pip3 install jsbeautifier
 ┌──(kali㉿kali)-[~/custom_js]
 └─$ 
 ```
+Now that we have a readable version of the custom JavaScript, we can begin reviewing the files. Our goal is to determine how the WebSocket server works in order to be able to interact with it. From this point forward, we will analyze the uncompressed files.
+### Analyzing JavaScript

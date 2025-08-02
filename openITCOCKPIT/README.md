@@ -593,3 +593,107 @@ loadConsole: function() {
 },
 ```
 A closer inspection of this code confirms that this function may result in RCE.
+
+This command is used in the `loadConsole` function where there are also references to `jqconsole`. An input to the prompt is passed directly with `"execute_nagios_command"`. A quick search for `jqconsole` reveals that it is a jQuery terminal plugin.
+
+#### Decoding the Communication
+let's try to understand the communication steps. We will work backwards by looking at what is sent to the `send` function. We will begin our review at the line in `controller.js` where `execute_nagios_command` is sent to the `send` function:
+```javascript
+4691 self.WebsocketSudo.send(self.WebsocketSudo.toJson('execute_nagios_command', input));
+```
+Line `4691` of `controller.js` sends `execute_nagios_command` along with an input to a function called `toJson`. Let's inspect what the `toJson` function does.
+
+First, we will discover where the function is defined. To do this, we can use `grep` to search for all instances of `toJson`, which will return many instances. To filter these out, we will use `grep` with the `-v` flag and look for the `.send` keyword.
+```bash
+┌──(kali㉿kali)-[~/custom_js]
+└─$ grep -r  "toJson" ./ --exclude="compressed*" | grep -v ".send"
+./pretty/angular_services.js:        toJson: function(task, data) {
+./pretty/angular_services.js:        toJson: function(task, data) {
+./pretty/components.js:    toJson: function(task, data) {
+                                                                                                                                                                                             
+┌──(kali㉿kali)-[~/custom_js]
+└─$
+```
+The search for `toJson` revealed that the function is set in `angular_services.js` and `components.js`. The `components.js` file is the file where we initially found the `WebsocketSudoComponent` component. Since we've already found useful information in `components.js`, we will open the file and search for the `toJson` reference. The definition of `toJson`:
+```javascript
+1310  toJson: function(task, data) {
+1311      var jsonArr = [];
+1312      jsonArr = JSON.stringify({
+1313          task: task,
+1314          data: data,
+1315          uniqid: this._uniqid,
+1316          key: this._key
+1317      });
+1318      return jsonArr
+1319  },
+```
+The `toJson` function converts a task (like `execute_nagios_command`) and some input data into a JSON string containing four fields: the task, the data, a unique ID (`uniqid`), and a key. While the task and data are passed in directly, the `uniqid` is generated elsewhere — specifically in a function named `_onResponse`, located above the `toJson` function. The source of the `key` is still unclear.
+```javascript
+1283  _onResponse: function(e) {
+1284      var transmitted = JSON.parse(e.data);
+1285      switch (transmitted.type) {
+1286          case 'connection':
+1287              this._uniqid = transmitted.uniqid;
+1288              this.__success(e);
+1289              break;
+1290          case 'response':
+1291              if (this._uniqid === transmitted.uniqid) {
+1292                  this._callback(transmitted)
+1293              }
+1294              break;
+1295          case 'dispatcher':
+1296              this._dispatcher(transmitted);
+1297              break;
+1298          case 'event':
+1299              if (this._uniqid === transmitted.uniqid) {
+1300                  this._event(transmitted)
+1301              }
+1302              break;
+1303          case 'keepAlive':
+1304              break
+1305      }
+1306  }
+```
+The `_onResponse` function runs when a message is received. It sets `uniqid` using a value sent by the server. The server is expected to send this `uniqid` during the connection. Additionally, the server can send five types of responses: `connection`, `response`, `dispatcher`, `event`, and `keepAlive` — this detail is noted for future reference.
+
+Now let's determine the source of the `_key` value. The setup function in the same `components.js` file provides some clues:
+```javascript
+1260  setup: function(wsURL, key) {
+1261      this._wsUrl = wsURL;
+1262      this._key = key
+1263  },
+```
+When `setup` is called, the WebSocket URL and the `_key` variable in the `WebsocketSudo` component are set. Let's `grep` for calls to this function:
+```bash
+┌──(kali㉿kali)-[~/custom_js]
+└─$ grep -r  "setup(" ./ --exclude="compressed*"
+...
+./pretty/controllers.js:    _setupChatListFilter: function() {
+./app_controller.js:        this.ImageChooser.setup(this._dom);
+./app_controller.js:  this.FileChooser.setup(this._dom);
+./app_controller.js:      this.WebsocketSudo.setup(this.getVar('websocket_url'), this.getVar('akey'));
+```
+The final and most relevant `setup(` call uses arguments previously defined in `commands.html`, confirming the pieces needed to construct an `execute_nagios_command` task. However, to ensure nothing is overlooked, it's important to review the initial WebSocket connection process — specifically by examining the `connect` function in `components.js`.
+```javascript
+1264  connect: function() {
+1265      if (this._connection === null) {
+1266          this._connection = new WebSocket(this._wsUrl)
+1267      }
+1268      this._connection.onopen = this._onConnectionOpen.bind(this);
+1269      this._connection.onmessage = this._onResponse.bind(this);
+1270      this._connection.onerror = this._onError.bind(this);
+1271      return this._connection
+1272  },
+```
+The `connect` function establishes a new WebSocket connection if one isn't already active. It then assigns handlers for the `onopen`, `onmessage`, and `onerror` events. When the connection opens, it triggers the `_onConnectionOpen` function, which is the next focus for investigation.
+```javascript
+1277 _onConnectionOpen: function(e) {
+1278     this.requestUniqId()
+1279 },
+...
+1307 requestUniqId: function() {
+1308     this.send(this.toJson('requestUniqId', ''))
+1309 },
+```
+The `_onConnectionOpen` function simply calls `requestUniqId`, which sends a request to the server for a unique ID. This step is essential to remember when interacting with the WebSocket server.
+### Interacting With the WebSocket Server

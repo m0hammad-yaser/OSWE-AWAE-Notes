@@ -698,5 +698,20 @@ The `connect` function establishes a new WebSocket connection if one isn't alrea
 The `_onConnectionOpen` function simply calls `requestUniqId`, which sends a request to the server for a unique ID. This step is essential to remember when interacting with the WebSocket server.
 ### Interacting With the WebSocket Server
 Now that we understand WebSocket requests, we can begin to interact with the server. Although BurpSuite can interact with a WebSocket server, the user interface is not ideal for our situation. BurpSuite also lacks a WebSocket *Intruder*. Because of these limitations, we will instead build our own client in Python.
+#### Steps in Burp Suite (Repeater / Proxy > WebSockets)
+1. In *Proxy* > *WebSockets history*
+2. Choose any request with `➡️ To server`
+3. Send to *Repeater* (You might need to press `Reconnect` button)
+4. Craft you rquest and click `Send`
+   Example request:
+```json
+{
+  "task": "execute_nagios_command",
+  "data": "ls",
+  "uniqid": "",
+  "key": "1fea123e07f730f76e661bced33a94152378611e"
+}
+```
+5. Response received in the History tab (On your righthand)
 #### Building a Client
 We will build a script that allows us to connect and send any command as `"input"`. This will help us learn how the server sends its responses.

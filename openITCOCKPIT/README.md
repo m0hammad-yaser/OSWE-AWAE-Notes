@@ -325,6 +325,10 @@ WARNING: This is a development server. Do not use it in a production deployment.
 Press CTRL+C to quit
 
 ```
+
+#### Building the `client.js`
+
+
 Note: place [api.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/api.py), [db.py](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/db.py) and [client.js](https://github.com/m0hammad-yaser/OSWE-AWAE-Notes/blob/main/openITCOCKPIT/client.js) in the same directory.
 
 As a victim, visit:
